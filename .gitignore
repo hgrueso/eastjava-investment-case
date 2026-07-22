@@ -1,0 +1,11 @@
+data/**/*.dta
+data/**/*.sav
+data/**/*.csv
+.Rproj.user/
+.Rhistory
+.RData
+*_files/
+*_cache/
+code/*.knit.md
+code/*.html
+.DS_Store

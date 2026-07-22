@@ -1,0 +1,476 @@
+---
+title: "Skills Development for Adolescent Girls"
+subtitle: "Investment case · East Java, Indonesia"
+author: "Hernando Grueso, PhD · UNICEF"
+date: "1 July 2026"
+lang: en
+format:
+  revealjs:
+    theme: default
+    slide-number: c/t
+    transition: fade
+    embed-resources: true
+    fig-align: center
+    include-in-header:
+      text: |
+        <style>
+        .reveal .section-divider h1,
+        .reveal .section-divider h2 { color:#fff !important; }
+        .reveal em { color:#E2007A; font-style:normal; font-weight:600; }
+        .reveal .placeholder {
+        border:2px dashed #b9c2cc; border-radius:12px; background:#f6f8fa;
+        padding:.7em 1em; color:#5a6b73; font-size:.8em; }
+        .reveal .placeholder .ph-tag {
+        font-family:monospace; color:#00377C; font-weight:700;
+        text-transform:uppercase; font-size:.8em; letter-spacing:.04em; }
+        .reveal .note { color:#cdd8e3; font-size:.7em; }
+        .reveal table { font-size:.46em; }
+        .reveal table th { color:#00377C; border-bottom:2px solid #d9e2ec; }
+        .reveal .tight-table table { font-size:.74em; border-collapse:collapse; width:100%; }
+        .reveal .tight-table table td, .reveal .tight-table table th { padding:2px 5px; }
+        .reveal .big-table table { font-size:.85em; border-collapse:collapse; width:100%; }
+        .reveal .big-table table td, .reveal .big-table table th { padding:4px 6px; }
+        .vc-row { display:flex; align-items:center; justify-content:center; gap:.4em; flex-wrap:wrap; margin-top:1.2em; }
+        .vc-box { background:#eaf6fc; border:1.5px solid #1CABE2; color:#00377C; border-radius:10px;
+                  padding:.55em .8em; font-weight:600; font-size:.62em; text-align:center; min-width:8.5em; }
+        .vc-box.benefit { background:#e8f5e9; border-color:#2e7d32; color:#1b5e20; }
+        .vc-box.cost { background:#fde9f2; border-color:#E2007A; color:#a3005a; }
+        .vc-arrow { font-size:1.3em; color:#9aa7ad; }
+        /* compact horizontal value-chain flow, fits on one slide */
+        .vc-flow { display:flex; align-items:center; justify-content:center; flex-wrap:nowrap;
+                   gap:.25em; margin-top:1.6em; }
+        .vc-node { background:#eaf6fc; border:1.5px solid #1CABE2; color:#00377C; border-radius:8px;
+                   padding:.5em .55em; font-weight:700; font-size:.62em; text-align:center;
+                   line-height:1.25; flex:1 1 0; }
+        .vc-node small { display:block; font-weight:400; font-size:.85em; color:#3a6b85; margin-top:.2em; }
+        .vc-flow-arrow { font-size:1.1em; color:#9aa7ad; flex:0 0 auto; }
+        .vc-result-row { display:flex; align-items:center; justify-content:center; gap:.8em; margin-top:1.4em; }
+        .vc-result-box { border-radius:10px; padding:.7em 1.2em; font-weight:700; font-size:.72em; text-align:center; }
+        .vc-result-box.benefit { background:#e8f5e9; border:1.5px solid #2e7d32; color:#1b5e20; }
+        .vc-result-box.cost { background:#fde9f2; border:1.5px solid #E2007A; color:#a3005a; }
+        .vc-result-box.bcr { background:#fff7e6; border:1.5px solid #FFC20E; color:#7a5b00; }
+        .bcr-grid { display:flex; flex-direction:column; gap:.9em; margin-top:.8em; }
+        .bcr-col { border-radius:10px; padding:1em 1.3em; font-size:.78em; }
+        .bcr-col.counted { background:#e8f5e9; border:1.5px solid #2e7d32; }
+        .bcr-col.notcounted { background:#f4f4f4; border:1.5px solid #999; }
+        .bcr-col h4 { margin-top:0; font-size:1.15em; }
+        .toc-grid { font-size:.9em; line-height:1.6; margin-top:1.2em; }
+        .toc-grid p { margin-bottom:.9em; }
+        .toc-grid b { color:#00377C; }
+        .kf-list { font-size:.68em; line-height:1.85; }
+        .kf-list b { color:#E2007A; }
+        </style>
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+suppressPackageStartupMessages({ library(readr); library(dplyr); library(knitr); library(tibble) })
+FIG <- function(file, width = "90%") {
+  p <- file.path("..", "output", "figures", file)
+  if (file.exists(p))
+    cat(sprintf("![](%s){fig-align=\"center\" width=%s}\n", p, width))
+  else
+    cat("::: {.placeholder}\n<span class='ph-tag'>\u25a2 pending data</span><br>Figure pending — run the corresponding script (see README) to generate it.\n:::\n")
+}
+TAB <- file.path("..", "output", "tables", "t8_target_funnel.csv")
+```
+
+## Contents
+
+::: {.toc-grid}
+**1 · Diagnostic** — scale &amp; profile of the gap (NEET, child marriage, early pregnancy, poverty)
+
+**2 · Evidence → Theory of Change** — what works, and how it maps to Double Track
+
+**3 · Projections** — returns to education (wage &amp; consumption based)
+
+**4 · Costing &amp; ROI** — component costs, benefit value chain, BCR
+
+**5 · Key Findings** — the analysis in one slide
+
+**6 · Methods &amp; Data** — sample, data-availability plan, transportability method, Mincer specification
+:::
+
+# 1 · Diagnostic — scale &amp; profile of the gap {.section-divider background-color="#00377C"}
+
+## The gap is in the transition, not the classroom {.smaller}
+```{r f1a, results='asis'}
+FIG("f1a_outcomes_by_sex_en.png", "80%")
+```
+
+::: {style="font-size:0.6em; color:#7a7a7a;"}
+Girls 15–24 are at parity (slightly ahead) in school, yet their NEET rate is **~2× boys'** (28% vs 13%) and employment far lower (26% vs 44%) — the disadvantage is the school-to-work transition (marriage, caregiving, gender norms), not schooling. SUSENAS Maret 2024, survey-weighted; 95% CIs.
+:::
+
+## Outcomes by area of residence
+```{r f1b, results='asis'}
+FIG("f1b_outcomes_by_sex_area_en.png", "92%")
+```
+
+## Where NEET concentrates — by district {.smaller}
+```{r f6, results='asis'}
+FIG("f6_neet_by_kabkota_en.png", "62%")
+```
+
+::: {style="font-size:0.55em; color:#7a7a7a;"}
+SUSENAS Maret 2024, girls 15–24, survey-weighted; East Java districts with ≥15 sampled girls.
+:::
+
+## Outcomes by per-capita expenditure quintile
+```{r f1d, results='asis'}
+FIG("f1d_outcomes_by_sex_wealth_en.png", "92%")
+```
+
+## The digital divide — access vs. use
+```{r f2, results='asis'}
+FIG("f2_digital_by_area_sex_en.png", "88%")
+```
+
+## Child marriage — a pathway into exclusion {.smaller}
+```{r f9, results='asis'}
+FIG("f9_marriage_pathway_en.png", "78%")
+```
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Girls 15–24, SUSENAS Maret 2024, survey-weighted (95% CIs). Girls married before 18 are far more likely to be NEET and out of school. **Association, not causal** — direction is not identified (marriage and leaving school are mutually reinforcing). 5.4% of East-Java girls 15–24 married before 18 (vs 0.4% of boys), from the household roster's age-at-first-marriage question.
+:::
+
+## Early pregnancy — the twin pathway {.smaller}
+```{r f13, results='asis'}
+FIG("f13_pregnancy_pathway_en.png", "84%")
+```
+
+::: {style="font-size:0.6em; color:#7a7a7a;"}
+First pregnancy before 18 (SUSENAS Blok XV). Early pregnancy and child marriage are tightly sequenced — pregnancy often precipitates marriage under social pressure. SUSENAS records pregnancies only for ever-married women, so these are **lower-bound** estimates.
+:::
+
+## Poverty drives child marriage {.smaller}
+```{r f11, results='asis'}
+FIG("f11_marriage_by_wealth_en.png", "80%")
+```
+
+::: {style="font-size:0.6em; color:#7a7a7a;"}
+Child marriage falls steeply from the poorest to the richest expenditure quintile — the mechanism a cash-transfer (Cash+) component is designed to interrupt. Indonesia's own PKH cut girls' child marriage by ~3.5pp (Priebe &amp; Sumarto, 2025).
+:::
+
+## Poverty also drives early pregnancy {.smaller}
+```{r f12, results='asis'}
+FIG("f12_pregnancy_by_wealth_en.png", "80%")
+```
+
+::: {style="font-size:0.6em; color:#7a7a7a;"}
+The same poverty gradient as child marriage — one mechanism, two manifestations. This is the entry point for a **Cash+ component**: PKH reduced girls' child marriage by ~3.5pp (Priebe &amp; Sumarto, 2025).
+:::
+
+## Formal tests — marriage, pregnancy, poverty &amp; exclusion {.smaller}
+::: {.tight-table}
+```{r marriage-tests}
+rd <- function(p) tryCatch(readr::read_csv(file.path("..","output","models",p),
+        show_col_types=FALSE), error=function(e) NULL)
+mtab <- dplyr::bind_rows(rd("marriage_tests.csv"), rd("pregnancy_tests.csv")) |>
+  dplyr::select(Hypothesis, `Effect (pp)`, SE, p)
+if (nrow(mtab) > 0) knitr::kable(mtab, align="lrrr")
+```
+:::
+
+::: {style="font-size:0.52em; color:#7a7a7a;"}
+Linear-probability estimates, girls 15–24, survey-weighted, PSU-clustered, N ≈ 6,100–6,200 per model (SUSENAS Maret 2024). Effects in percentage points. **Controls**: models of marriage/pregnancy → outcomes include age, urban/rural, and per-capita-expenditure poverty (Q1–Q2); models of poverty → marriage/pregnancy, and the two interaction terms, include age and urban/rural. Robust to adding **district fixed effects**. Poverty raises the risk of both marriage and pregnancy, and marriage/pregnancy independently predict much higher NEET — but the **poverty × marriage/pregnancy interaction is not statistically significant** (p=0.16 and p=0.65), so the data do not support an amplified penalty specifically for poor girls; the case for pairing skills programming with cash transfers rests on the poverty→marriage/pregnancy pathway itself, reinforced by PKH's own child-marriage evidence. Association, not causal identification.
+:::
+
+## Target population — adolescent girls 15–24
+```{r f7, results='asis'}
+FIG("f7_target_funnel_en.png", "85%")
+```
+
+# 2 · Evidence → Theory of Change {.section-divider background-color="#00377C"}
+
+## What works — best-matched evidence (raw) {.smaller}
+
+```{r evidence-table}
+tibble::tribble(
+  ~Programme, ~Design, ~"Girls / age", ~Focus, ~"Key result", ~"Fit for East Java",
+  "Adolescent girls' wellbeing — Bergström &amp; Özler 2021", "Review (104 studies)", "Adolescent girls", "Multi-sector interventions", "Integrated packages beat single-sector ones", "Synthesis backbone for the ToC",
+  "NEET in Indonesia — Faizah, Isbah &amp; Azca 2025", "Qualitative", "Youth (gendered)", "Drivers of girls' NEET", "Non-education factors (norms, care, marriage) drive girls' NEET", "Indonesia-specific NEET context",
+  "ELA girls' clubs — Bandiera 2018 (Sierra Leone)", "RCT", "Girls 12–25", "Vocational + life skills", "Enrolment +8.5pp; more income-generating activity", "Closest Skills4Girls-in-Double-Track model",
+  "Female digital-employment bootcamp — Alzúa 2020 (Argentina/Colombia)", "RCT", "Women 18–50", "Coding for employment", "Large coding-skill gains", "Core digital-skills → jobs arm",
+  "Irumi — Näslund-Hadley 2025 (Paraguay)", "RCT", "Pupils", "Computational thinking", "+0.09 SD CT", "Structured CT pedagogy",
+  "Robotics &amp; Coding — Gülen 2025 (Turkey)", "RCT", "Girls 14–16", "Robotics / coding", "Higher STEM-career orientation", "Girls' STEM, secondary age",
+  "Samata — Prakash 2019 (India)", "RCT", "Poor girls 13–16", "Secondary-transition support", "More girls transition; norm shift", "South Asia; senior-secondary transition",
+  "Room to Read GEP — Edmonds 2021 (India)", "RCT", "Girls", "Life skills + mentoring", "Dropout −3.5 to −4.1pp", "Mentoring/pedagogy layer cuts dropout",
+  "Negotiating a Better Future — Ashraf 2025 (Zambia)", "RCT", "Girls ~14", "Negotiation skills", "+0.26 years schooling (10-yr)", "Durable, cheap soft-skills layer",
+  "OLPC / Plan Ceibal — de Melo 2014 (Uruguay)", "Quasi / review", "Pupils", "Laptops (hardware-led)", "Learning ≈ null (−0.05 SD)", "Caution: hardware alone fails → fund pedagogy"
+) |> kable(align = "llllll")
+```
+
+::: {style="font-size:0.55em; color:#7a7a7a;"}
+Raw effects, <em>as reported in each source</em> — not yet anchored. Source: project evidence database, 51 studies (Grueso et al., 2026, paper in development). No Indonesia RCT exists, so effects are φ-transported to East Java (method in Section 5 · Methods &amp; Data).
+:::
+
+## Theory of change — skills for girls → lower NEET
+
+```{mermaid}
+%%| fig-width: 13
+flowchart LR
+  A1["Digital &amp; 21st-C skills<br/>content + connectivity"]:::a
+  A2["Girls-responsive pedagogy<br/>teacher training + mentoring"]:::b
+  A3["Ancillary supports<br/>marriage-delay, flexible<br/>learning, safe spaces"]:::c
+  O1["Skills acquired<br/>digital · STEM · socio-emotional"]:::o
+  O2["Stay enrolled,<br/>complete senior secondary"]:::o
+  M1["Transition to<br/>higher ed / work"]:::o
+  R["Lower NEET ·<br/>narrower gender gap"]:::r
+  I["Higher lifetime earnings ·<br/>productivity → 2045 Vision"]:::r
+  A1 --> O1
+  A2 --> O1
+  A2 --> O2
+  A3 --> O2
+  O1 --> M1
+  O2 --> M1
+  M1 --> R --> I
+  classDef a fill:#eaf6fc,stroke:#1CABE2,color:#00377C
+  classDef b fill:#fde9f2,stroke:#E2007A,color:#a3005a
+  classDef c fill:#f4f4f4,stroke:#999,color:#555
+  classDef o fill:#fff7e6,stroke:#FFC20E,color:#7a5b00
+  classDef r fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
+```
+
+::: {style="font-size:0.6em; color:#7a7a7a;"}
+Embedded in Double Track / <em>Tambahan Keterampilan</em>. Evidence: ELA → O2/M1; Alzúa/Irumi/Gülen → O1/M1;
+Room to Read/Negotiating → O2 (pedagogy layer); OLPC → caution on hardware-led A1. Measured against the
+ToR: cost per NEET averted, transition to HE/work, BCR/NPV.
+:::
+
+## Raw effect → anchored effect {.smaller}
+::: {.tight-table}
+```{r anchor-table}
+suppressPackageStartupMessages(library(dplyr))
+tibble::tribble(
+  ~prog, ~ctry, ~unit, ~eff, ~se, ~pop, ~geo, ~econ, ~deliv,
+  "ELA girls' clubs (Bandiera 2018)",        "SLE",  "pp",          0.085, 0.049, 0.95, 0.65, 0.80, 0.70,
+  "Female coding bootcamp (Alzúa 2020)",      "Arg./Col.","score-SD",    1.080, 0.184, 0.70, 0.50, 0.85, 0.70,
+  "Negotiation skills (Ashraf 2025)",         "ZMB",  "yrs",         0.264, 0.114, 0.90, 0.65, 0.80, 0.70,
+  "Room to Read GEP (Edmonds 2021)",          "IND",  "pp dropout", -0.035, 0.018, 0.95, 0.85, 0.90, 0.70,
+  "Irumi comp. thinking (Näslund-Hadley 2025)","PRY", "SD",          0.089, 0.052, 0.80, 0.50, 0.85, 0.70
+) |>
+  mutate(prod = pop*geo*econ*deliv,
+         rlo = eff-1.96*se, rhi = eff+1.96*se,
+         alo = rlo*prod, ahi = rhi*prod, adj = eff*prod,
+         `Raw effect (95% CI)` = sprintf("%+.3f [%+.3f, %+.3f] %s", eff, rlo, rhi, unit),
+         `φpop`=sprintf("%.2f",pop), `φgeo`=sprintf("%.2f",geo),
+         `φecon`=sprintf("%.2f",econ), `φdeliv`=sprintf("%.2f",deliv),
+         `Adjusted (95% CI)` = sprintf("%+.3f [%+.3f, %+.3f]", adj, alo, ahi),
+         Sig = ifelse(sign(alo)==sign(ahi), "✓", "—")) |>
+  transmute(Programme = paste0(prog, " — ", ctry),
+            `Raw effect (95% CI)`, `φpop`, `φgeo`, `φecon`, `φdeliv`,
+            `Adjusted (95% CI)`, Sig) |>
+  knitr::kable(align = "llrrrrll")
+```
+:::
+
+::: {style="font-size:0.55em; color:#7a7a7a;"}
+\u25a2 <b>Illustrative $\phi$ (judgment bands), not yet calibrated</b> — to be set against East-Java baselines from SUSENAS Maret 2024. Each row keeps its own outcome unit. Sig. ✓ = adjusted CI excludes zero. Raw effects/SEs from the evidence database (Grueso et al., 2026).
+:::
+
+# 3 · Projections — East Java {.section-divider background-color="#00377C"}
+
+## Returns to schooling — girls vs boys (wage-based) {.smaller}
+```{r f8, results='asis'}
+FIG("f8_mincer_earnings_en.png", "82%")
+```
+
+::: {style="font-size:0.6em; color:#7a7a7a;"}
+Earnings are **not collected in SUSENAS KOR**, so the Mincer return is estimated on **IFLS5 (2014/15)** wage earners 20–60 and applied to East Java. Raw return; girls +12.0%/yr, boys +9.4%/yr — entered into the cost-benefit at a selection-bounded **7–12%** range. Refine with Sakernas East-Java wages.
+:::
+
+## Predicted consumption by schooling — girls vs boys {.smaller}
+
+Since SUSENAS collects no wages, we estimate the **welfare return to schooling** using household **per-capita consumption** (`KAPITA`) — adults 25–54, survey-weighted, PSU-clustered, same quadratic specification as the Mincer equation below, so the curve is **model-based and age-adjusted**.
+
+```{r f14, results='asis'}
+FIG("f14_consumption_mincer_bysex_en.png", "78%")
+```
+
+::: {style="font-size:0.6em; color:#7a7a7a;"}
+Fitted values from the by-sex regression, age held at the sample mean — girls' return is again slightly above boys', consistent with the wage-based estimate.
+:::
+
+## Returns to education — consumption-based (SUSENAS 2024), the estimates {.smaller}
+
+::: {.tight-table}
+```{r mincer-susenas}
+suppressPackageStartupMessages(library(knitr))
+mt <- tryCatch(readr::read_csv(file.path("..","output","models","mincer_susenas.csv"),
+        show_col_types=FALSE), error=function(e) NULL)
+if (!is.null(mt)) mt |>
+  dplyr::mutate(Estimate=sprintf("%.3f",Estimate), SE=sprintf("%.3f",SE), p=sprintf("%.3f",p)) |>
+  kable(align="llrrr")
+```
+:::
+
+::: {style="font-size:0.55em; color:#7a7a7a;"}
+Coefficient on years of schooling ≈ proportional gain in per-capita consumption per year. Household-level consumption with individual education (a welfare, not wage, return). A **positive `years_school²`** term indicates **convex** (increasing) returns, shown separately by sex above.
+:::
+
+# 4 · Costing &amp; ROI {.section-divider background-color="#00377C"}
+
+## Component costs — pedagogy-first, sourced &amp; ranged {.smaller}
+
+All figures are **USD per girl, per year of programme exposure**.
+
+::: {.big-table}
+```{r costing-table}
+suppressPackageStartupMessages(library(knitr))
+ct <- tryCatch(readr::read_csv(file.path("..","output","projections","bcr_costing_table.csv"),
+        show_col_types=FALSE), error=function(e) NULL)
+if (!is.null(ct)) ct |> dplyr::select(-Source) |>
+  kable(align="lrrr", caption="USD per girl per year — Low / Central / High")
+```
+:::
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+**Source/method:** Programme- and literature-benchmarked unit costs, using Indonesia-specific sources where available. Training and mentoring costs are annualised from comparable programmes; connectivity assumes shared labs rather than 1:1 devices. Ancillary activities reflect ToR guidance, and overheads follow UNICEF's 10–20% range. Low/central/high estimates capture sourcing uncertainty. Replace with Double Track actuals once provincial financing data are available.
+:::
+
+## Benefit value chain {.smaller}
+
+::: {.vc-flow}
+<div class="vc-node">φ-adjusted NEET<br>reduction (pp)</div>
+<div class="vc-flow-arrow">→</div>
+<div class="vc-node">Extra years of<br>senior-secondary schooling</div>
+<div class="vc-flow-arrow">→</div>
+<div class="vc-node">Female Mincer return<small>IFLS5 wage / SUSENAS consumption</small></div>
+<div class="vc-flow-arrow">→</div>
+<div class="vc-node">× wage<br>× LFP<br>× working life</div>
+:::
+
+::: {.vc-result-row}
+<div class="vc-result-box benefit">Benefit, PV per girl</div>
+<div class="vc-flow-arrow">÷</div>
+<div class="vc-result-box cost">Cost = Σ components × exposure × (1+overhead)</div>
+<div class="vc-flow-arrow">=</div>
+<div class="vc-result-box bcr">BCR</div>
+:::
+
+::: {style="font-size:0.58em; color:#7a7a7a; margin-top:1.2em;"}
+The effect chain (top row) runs left to right into the benefit; cost is computed independently, and the two combine into the BCR.
+:::
+
+## BCR &amp; cost per NEET averted — a range, not a point {.smaller}
+::: {.tight-table}
+```{r bcr-table}
+comma_fix <- function(x) {
+  num <- suppressWarnings(as.numeric(gsub(",", "", x)))
+  ifelse(!is.na(num), formatC(num, format="d", big.mark=","), x)
+}
+br <- tryCatch(readr::read_csv(file.path("..","output","projections","bcr_scenarios_table.csv"),
+        show_col_types=FALSE), error=function(e) NULL)
+if (!is.null(br)) br |>
+  dplyr::select(Scenario, `Years edu gained`, `Benefit PV (USD/girl)`,
+                `Cost (USD/girl)`, BCR, `Cost per NEET averted (USD)`) |>
+  dplyr::mutate(`Cost per NEET averted (USD)` = comma_fix(`Cost per NEET averted (USD)`)) |>
+  kable(align="lrrrrr")
+```
+:::
+
+::: {style="font-size:0.55em; color:#7a7a7a;"}
+Honest bounding: the **Low** scenario carries the φ-adjusted effect's null (CI includes zero), so its BCR/cost-per-NEET is undefined — the programme's return is conditional on a real effect, to be confirmed at pilot. Every input is a sourced, editable assumption (see Methods &amp; Data).
+:::
+
+## What the BCR does and does not count {.smaller}
+
+::: {.bcr-grid}
+<div class="bcr-col counted">
+<h4>✓ Counted</h4>
+Higher schooling → lifetime earnings premium for girls moved out of NEET, via the female Mincer return (wage or consumption based) applied over the discounted working life.
+</div>
+<div class="bcr-col notcounted">
+<h4>— Not counted <span style="font-weight:400;">(so the BCR is conservative)</span></h4>
+Intergenerational gains (Akresh et al. 2022) · delayed child marriage &amp; reduced IPV · health &amp; productivity spillovers · fiscal returns · broader empowerment
+</div>
+:::
+
+::: {style="font-size:0.58em; color:#7a7a7a; margin-top:1em;"}
+Poverty enters as **long-term productivity / lifetime earnings**, not immediate income transfers (MoF-defensible framing, per ToR).
+:::
+
+# 5 · Key Findings {.section-divider background-color="#00377C"}
+
+## Key findings {.smaller}
+
+::: {.kf-list}
+**1. The gap is in the transition, not the classroom.** Girls match or lead boys in schooling, but carry ~2× the NEET rate (28% vs 13%) and far lower employment.
+
+**2. Child marriage and early pregnancy are major, measurable, and tightly linked exclusion pathways.** 5.4% of girls 15–24 married before 18 (vs 0.4% of boys); those girls are far more likely to be NEET (75% vs 25%) and out of school. Early pregnancy shows the identical pattern (76% NEET vs 26%; lower-bound, ever-married women only) and is itself strongly associated with child marriage.
+
+**3. Both pathways are poverty-graded.** Child marriage and early pregnancy both fall steeply from the poorest to the richest expenditure quintile, and poverty significantly raises the risk of each (formal tests, p&lt;0.01) — the empirical basis for pairing skills programming with a **Cash+ (cash-transfer) component**, reinforced by Indonesia's own PKH evidence (−3.5pp child marriage).
+
+**4. The data do not show a significantly larger penalty for poor girls specifically** — the poverty × marriage/pregnancy interaction is not statistically significant. The cash-transfer rationale rests on poverty driving marriage/pregnancy risk itself, not on an amplified exclusion penalty.
+
+**5. Returns to schooling are real, convex, and slightly higher for girls** across two independent measures — wages (IFLS5, +12.0%/yr) and household consumption (SUSENAS 2024, +5.6%/yr) — with the pay-off steepening at senior-secondary and beyond.
+
+**6. Disability cannot currently be assessed.** The Washington Group items are absent from the SUSENAS extract in hand; this is flagged as a data gap, not filled with a guess.
+:::
+
+# 6 · Methods &amp; Data {.section-divider background-color="#00377C"}
+
+## Data &amp; sample — *current source* {.smaller}
+
+::: {style="font-size:0.84em"}
+**Source.** **SUSENAS Maret 2024**, East Java (province 35) — KOR individual file
+(`ssn202403_kor_ind1`, 104,599 persons), with per-capita monthly expenditure
+(`KAPITA`, KP block 43) merged by household. Adolescents 15–24: **13,340** (6,221 girls).
+**Weighted, PSU/strata-clustered** (`FWT`, `PSU`, `STRATA`) → exact standard errors.
+
+**Key constructions:**
+
+- **NEET (15–24)** = main activity (`R704`) is neither *working* nor *schooling*, and not currently attending (`R610`). Activity-based measure; aligns with BPS practice. (`R701`/`R702` were found to invert the gender pattern and are **not** used.)
+- **Sex** `R405` (1 = male, 2 = female) · **age** `R407` · **married before 18** from age at first marriage (`R409`) · **early pregnancy** from age at first pregnancy (Blok XV, ever-married women only).
+- **Wealth quintiles** from per-capita expenditure (`KAPITA`).
+
+**Validation.** Weighted girls 15–24 = **2.83M** (ToR ≈ 2.77M); girls NEET ≈ **30%** (matches ToR 30.5%) and **higher than boys' ≈ 16%** — the expected gender pattern.
+
+**Still to pin (from BPS codebook):** internet/digital use (confirmed usable); disability (Washington Group) — see contingency plan.
+:::
+
+## Data availability — contingency plan {.smaller}
+
+| Indicator | Preferred source | Status | Fallback |
+|---|---|---|---|
+| NEET, schooling, employment | SUSENAS 2024 (R610/R704) | **Available** | — |
+| Child marriage (<18) | SUSENAS R409 | **Available** | — |
+| Early pregnancy/birth (<18) | SUSENAS Blok XV (ind2) | **Available** — ever-married only (lower bound) | IDHS 2022 for all-women rates |
+| Consumption / wealth quintiles | SUSENAS KAPITA | **Available** | — |
+| Wages | Not collected in SUSENAS | Consumption Mincer used (5.4–5.6%/yr, convex) | Sakernas wage Mincer; IFLS5 (12%) |
+| Disability (Washington Group) | SUSENAS Blok X (R1002–R1009) | **Not in current extract** — confirmed absent after checking `ind1`, `ind2`, and the merged household file | Re-export KOR keeping Blok X; else BPS published tables |
+| Programme costs | Double Track budget (Prov. Govt) | Pending from client | Literature/EU-modelling unit costs (see Costing &amp; ROI) |
+
+::: {style="font-size:0.6em; color:#7a7a7a;"}
+Per ToR: definitions of NEET/employment to be validated with BPS.
+:::
+
+## Transporting evidence to East Java — the $\phi$ method {.smaller}
+
+No Indonesia RCT exists, so each raw effect is **attenuated** to East Java by a transparent, multiplicative factor (Grueso et al., 2026):
+
+$$\text{effect}_{\text{EJ}} = \text{effect}_{\text{raw}}\times\phi_{\text{pop}}\times\phi_{\text{geo}}\times\phi_{\text{econ}}\times\phi_{\text{deliv}}$$
+
+- $\phi_{\text{pop}}$ — match on sex/age/rural (girls-adolescent anchors score high)
+- $\phi_{\text{geo}}$ — distance band (South/SE Asia > SSA / LAC > Europe)
+- $\phi_{\text{econ}}$ — economic similarity, capped [0.30, 1.00]
+- $\phi_{\text{deliv}}$ — government roll-out vs NGO/research trial
+
+Each $\phi\le 1$ → **only attenuates, never amplifies**; 95% CIs propagated; the null stays in the low scenario.
+
+## The Mincer specification, formally {.smaller}
+
+Both the wage-based (IFLS5) and consumption-based (SUSENAS 2024) returns to schooling are estimated from the same underlying specification, run separately by sex:
+
+$$\ln(Y_i) = \beta_0 + \beta_1 S_i + \beta_2 S_i^2 + \beta_3 \text{Age}_i + \beta_4 \text{Age}_i^2 + \beta_5 \text{Urban}_i + \varepsilon_i$$
+
+- $Y_i$ — monthly wage (IFLS5 earners 20–60) **or** household per-capita expenditure (SUSENAS, adults 25–54)
+- $S_i$ — years of schooling (highest certificate attained)
+- $\beta_1$ — the linear return per additional year of schooling (the headline %/yr figure)
+- $\beta_2$ — the quadratic term; **$\beta_2>0$ and significant ⇒ convex returns** (pay-off accelerates at higher schooling levels)
+- Estimated **weighted**, with **PSU-clustered** standard errors (SUSENAS) or robust SEs (IFLS5)
