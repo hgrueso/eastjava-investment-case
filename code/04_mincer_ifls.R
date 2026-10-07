@@ -11,7 +11,7 @@ suppressPackageStartupMessages({
   library(here); library(glue); library(fixest); library(ggplot2); library(scales)
 })
 source(here::here("R","utils.R")); source(here::here("R","theme.R")); ensure_dirs()
-rd <- function(b,f) read_dta(file.path(here::here("data"), b, f)) |>
+rd <- function(b,f) read_dta(file.path(here::here("data","IFLS5"), b, f)) |>
   mutate(across(where(\(x) inherits(x,"haven_labelled")), as.numeric))
 
 # ---- CONFIG (verified against IFLS5 labels) -----------------------------
