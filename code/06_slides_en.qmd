@@ -1,8 +1,8 @@
 ---
 title: "Skills Development for Adolescent Girls"
-subtitle: "Investment case · East Java, Indonesia"
+subtitle: "Investment case, East Java, Indonesia"
 author: "Hernando Grueso, PhD · UNICEF"
-date: "31 August 2026"
+date: "7 October 2026"
 lang: en
 format:
   revealjs:
@@ -59,6 +59,11 @@ format:
         .toc-grid b { color:#00377C; }
         .kf-list { font-size:.68em; line-height:1.85; }
         .kf-list b { color:#E2007A; }
+        .stat-row { display:flex; justify-content:center; gap:1em; margin-top:1em; }
+        .stat { flex:1; text-align:center; background:#f6f8fa; border-radius:12px; padding:.8em .4em; }
+        .stat .n { font-size:1.9em; font-weight:800; color:#E2007A; line-height:1.1; }
+        .stat .l { font-size:.55em; color:#374649; margin-top:.4em; }
+        .msg { font-size:.62em; color:#374649; margin-top:.4em; }
         </style>
 execute:
   echo: false
@@ -81,157 +86,106 @@ TAB <- file.path("..", "output", "tables", "t8_target_funnel.csv")
 ## Contents
 
 ::: {.toc-grid}
-**1 · Diagnostic** — the size and shape of the gap
+**1 · The problem**: who is left out, where, and at what cost
 
-**2 · Testing the relationships** — regression analysis of what is associated with NEET
+**2 · Theory of change**: what the programme does and why it should work
 
-**3 · Evidence &amp; Theory of Change** — what has worked in Indonesia, and the proposed programme
+**3 · Return on investment**: key assumptions and results
 
-**4 · Costing &amp; ROI** — component costs and benefit-cost ratio
+**4 · Key messages**
 
-**5 · Key Findings**
-
-**Appendix** — data, definitions, and methods
+**Appendix**: regression results, methods and data
 :::
 
-# 1 · Diagnostic {.section-divider background-color="#00377C"}
+# 1 · The problem {.section-divider background-color="#00377C"}
 
-## Girls, boys, and the school-to-work transition {.smaller}
+## Girls attend school at the same rate as boys, but their NEET rate is close to double {.smaller}
 ```{r f1a, results='asis'}
-FIG("f1a_outcomes_by_sex_en.png", "80%")
-```
-
-::: {style="font-size:0.6em; color:#7a7a7a;"}
-Girls 15–24 are slightly ahead of boys in school attendance (51% vs 50%), but their NEET rate is close to double (23% vs 13%) and their employment rate is 12 points lower (25% vs 37%). The difference appears at the transition out of school, not within it. SUSENAS Maret 2025, survey-weighted; 95% CIs.
-:::
-
-## Forgone lifetime productivity from the NEET gap {.smaller}
-
-```{r f15, results='asis'}
-FIG("f15_lifetime_loss_en.png", "84%")
-```
-
-::: {style="font-size:0.6em; color:#7a7a7a;"}
-**What this is**: the number of girls who are NEET in excess of the boys' rate, multiplied by the earnings each would be expected to make over a working lifetime, discounted to present value. Full calculation in `output/models/lifetime_loss.csv`.
-:::
-
-## The gap in national context {.smaller}
-
-```{r f19, results='asis'}
-FIG("f19_national_benchmark_en.png", "80%")
-```
-
-::: {style="font-size:0.6em; color:#7a7a7a;"}
-The same NEET gender gap computed for every Indonesian province from the same survey, showing where East Java sits relative to the national average. See `output/models/national_benchmark.csv`.
-:::
-
-## NEET among girls, by district {.smaller}
-```{r f6, results='asis'}
-FIG("f6_neet_by_kabkota_en.png", "62%")
-```
-
-::: {style="font-size:0.55em; color:#7a7a7a;"}
-SUSENAS Maret 2025, girls 15–24, survey-weighted; East Java districts with ≥15 sampled girls.
-:::
-
-## Digital access and use {.smaller}
-```{r f2, results='asis'}
-FIG("f2_digital_by_area_sex_en.png", "88%")
-```
-
-## Child marriage, schooling, and labour-market outcomes {.smaller}
-```{r f9, results='asis'}
-FIG("f9_marriage_pathway_en.png", "78%")
-```
-
-::: {style="font-size:0.56em; color:#7a7a7a;"}
-Girls 15–24, survey-weighted (95% CIs). Girls who married before 18 have a NEET rate of 59% against 22% for those who did not, and 8% are still in school against 53%. Around 4% of East-Java girls 15–24 married before 18. **Association, not causation** — the direction is not identified, and most NEET girls did not marry before 18.
-:::
-
-## Early pregnancy, schooling, and labour-market outcomes {.smaller}
-```{r f13, results='asis'}
-FIG("f13_pregnancy_pathway_en.png", "84%")
-```
-
-::: {style="font-size:0.6em; color:#7a7a7a;"}
-First pregnancy before 18 (SUSENAS Blok XV). SUSENAS records pregnancy history only for ever-married women, so these rates are a lower bound on the true prevalence.
-:::
-
-## Change between 2024 and 2025 {.smaller}
-
-```{r f18, results='asis'}
-FIG("f18_trend_2024_2025_en.png", "78%")
+FIG("f1a_outcomes_by_sex_en.png", "78%")
 ```
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
-Two consecutive SUSENAS rounds for girls 15–24. Girls' NEET fell 4.6 points and child marriage 1.3 points; school attendance and employment were essentially flat.
+Girls 15–24: 51% in school (boys 50%), 23% NEET (boys 13%), 25% employed (boys 37%). The gap opens at the transition out of school. SUSENAS Maret 2025, survey-weighted, 95% CIs.
 :::
 
-# 2 · Testing the relationships {.section-divider background-color="#00377C"}
-
-## Senior-secondary completion and NEET {.smaller}
-
-```{r f16, results='asis'}
-FIG("f16_completion_neet_en.png", "80%")
+## East Java's NEET gender gap is wider than the national average {.smaller}
+```{r f19, results='asis'}
+FIG("f19_national_benchmark_en.png", "76%")
 ```
 
-::: {style="font-size:0.56em; color:#7a7a7a;"}
-NEET rates by senior-secondary completion status, girls and boys separately. Regression-adjusted effect sizes in `output/models/completion_neet.csv`. Association, not causation: girls who complete senior secondary may differ from those who do not in ways this data does not capture.
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Girls-minus-boys NEET gap: 10.3 points in East Java against 7.9 points nationally. Same survey, same definition, all provinces.
 :::
 
-## Regression results — marriage, pregnancy and exclusion {.smaller}
-::: {.tight-table}
-```{r marriage-tests}
-rd <- function(p) tryCatch(readr::read_csv(file.path("..","output","models",p),
-        show_col_types=FALSE), error=function(e) NULL)
-mtab <- dplyr::bind_rows(rd("marriage_tests.csv"), rd("pregnancy_tests.csv")) |>
-  dplyr::select(Hypothesis, `Effect (pp)`, SE, p)
-if (nrow(mtab) > 0) knitr::kable(mtab, align="lrrr")
+## The gap costs an estimated USD 4.1 billion in forgone lifetime productivity {.smaller}
+```{r f15, results='asis'}
+FIG("f15_lifetime_loss_en.png", "80%")
 ```
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+About 288,000 girls are NEET in excess of the boys' rate. Each would be expected to earn about USD 14,100 more over a working lifetime (present value) if she had the boys' NEET rate.
 :::
 
-::: {style="font-size:0.52em; color:#7a7a7a;"}
-Linear-probability estimates, girls 15–24, survey-weighted, PSU-clustered. Effects in percentage points. Controls: age and urban/rural throughout, plus poverty where expenditure data is available. Robust to adding district fixed effects. Association, not causal identification.
+## Madura has higher NEET for girls and boys, with a similar gender gap {.smaller}
+```{r f20, results='asis'}
+FIG("f20_madura_en.png", "82%")
+```
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Girls' NEET is 34% in Madura (Bangkalan, Sampang, Pamekasan, Sumenep) against 22% in the rest of East Java; boys' NEET is 23% against 12%. The gender gap is similar (11 vs 10 points), and fewer girls are in school (45% vs 52%). Madura is a priority area for a pilot.
 :::
 
-# 3 · Evidence &amp; Theory of Change {.section-divider background-color="#00377C"}
+## Girls married before 18 are much more likely to be NEET and out of school {.smaller}
+```{r f9, results='asis'}
+FIG("f9_marriage_pathway_en.png", "74%")
+```
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Girls married before 18: 59% NEET (others 22%), 8% in school (others 53%). About 4% of girls 15–24 married before 18. Early pregnancy overlaps almost entirely with child marriage in this data, so we report child marriage only. Association, not causation.
+:::
+
+## Married girls who work are mostly in unpaid family work or own businesses {.smaller}
+```{r f21, results='asis'}
+FIG("f21_employment_type_en.png", "72%")
+```
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Among employed girls married before 18, 35% are wage employees (others 75%) and 31% are unpaid family workers (others 12%); 22% work under 20 hours a week (others 12%). Their employment is lower-quality work. Based on 78 employed married girls, so indicative.
+:::
+
+## Girls' NEET fell from 2024 to 2025, slightly more than in the rest of Indonesia {.smaller}
+```{r f23, results='asis'}
+FIG("f23_trend_ej_vs_national_en.png", "70%")
+```
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Girls' NEET fell 5.6 points in East Java and 4.5 in the rest of Indonesia; child marriage fell 1.3 and 0.7 points. Tertiary enrolment at 18–20 rose 3.2 points, less than elsewhere (5.0). Most of the NEET decline is national, partly reflecting a change in the survey's activity question, so it cannot be attributed to a programme. A district-level comparison with programme districts is pending.
+:::
+
+# 2 · Theory of change {.section-divider background-color="#00377C"}
+
+## Completing senior secondary is associated with 20 points lower NEET for girls {.smaller}
+```{r f22, results='asis'}
+FIG("f22_completion_left_school_en.png", "74%")
+```
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Among 18–20 year olds who have left school, girls who completed senior secondary have a NEET rate of 41%, against 62% for those who did not. Adjusted for age and area (girls 18–24), completion is associated with a 20-point lower NEET rate (p&lt;0.001). For boys there is no difference. Keeping girls in school to completion is the programme's main lever.
+:::
 
 ## Evidence from Indonesia {.smaller}
 
 ::: {.tight-table}
 | Programme | Design | Result | Relevance |
 |---|---|---|---|
-| **PKH** conditional cash transfer (Priebe &amp; Sumarto, 2025) | Quasi-experimental | Girls' junior-secondary enrolment +5.2pp; child marriage −3.5pp | Direct evidence a cash component reduces child marriage in Indonesia |
-| **PIP** education assistance (Ulfa &amp; Rezki, 2024) | Quasi-experimental | School attendance +11.4pp | Anchors the attendance effect used in the ROI model |
-| **PIP** — girls' senior secondary (Caniago, 2021) | Quasi-experimental | Girls' senior-secondary enrolment +24.6pp | Senior-secondary transition, the stage this programme targets |
-| **Vocational training** (Pritadrajati, 2022) | Quasi-experimental | Female LFPR +3.4pp; income +5.6%; BCR up to 22.4 | Indonesian precedent for skills-to-work returns |
-| NEET in Indonesia (Faizah, Isbah &amp; Azca, 2025) | Qualitative | Norms, care duties and marriage drive girls' NEET | Explains the transition gap seen in Section 1 |
+| **PKH** cash transfer (Priebe &amp; Sumarto, 2025) | Quasi-experimental | Girls' junior-secondary enrolment +5.2pp; child marriage −3.5pp | A cash component reduces child marriage |
+| **PIP** education assistance (Ulfa &amp; Rezki, 2024) | Quasi-experimental | School attendance +11.4pp | Anchors the effect used in the ROI |
+| **PIP**, girls' senior secondary (Caniago, 2021) | Quasi-experimental | Girls' senior-secondary enrolment +24.6pp | Targets the stage where girls drop out |
+| **Vocational training** (Pritadrajati, 2022) | Quasi-experimental | Female LFPR +3.4pp; income +5.6% | Skills translate into work |
 :::
 
-::: {style="font-size:0.55em; color:#7a7a7a;"}
-The ROI model in Section 4 is anchored on **PIP/PKH Indonesian effect sizes directly** — no cross-country transport discount is applied, because domestic evidence exists for this intervention type.
-:::
-
-## Comparable international evidence {.smaller}
-
-```{r evidence-table}
-tibble::tribble(
-  ~Programme, ~Design, ~"Girls / age", ~Focus, ~"Key result", ~"Fit for East Java",
-  "Adolescent girls' wellbeing — Bergström &amp; Özler 2021", "Review (104 studies)", "Adolescent girls", "Multi-sector interventions", "Integrated packages beat single-sector ones", "Synthesis backbone for the ToC",
-  "NEET in Indonesia — Faizah, Isbah &amp; Azca 2025", "Qualitative", "Youth (gendered)", "Drivers of girls' NEET", "Non-education factors (norms, care, marriage) drive girls' NEET", "Indonesia-specific NEET context",
-  "ELA girls' clubs — Bandiera 2018 (Sierra Leone)", "RCT", "Girls 12–25", "Vocational + life skills", "Enrolment +8.5pp; more income-generating activity", "Closest Skills4Girls-in-Double-Track model",
-  "Female digital-employment bootcamp — Alzúa 2020 (Argentina/Colombia)", "RCT", "Women 18–50", "Coding for employment", "Large coding-skill gains", "Core digital-skills → jobs arm",
-  "Irumi — Näslund-Hadley 2025 (Paraguay)", "RCT", "Pupils", "Computational thinking", "+0.09 SD CT", "Structured CT pedagogy",
-  "Robotics &amp; Coding — Gülen 2025 (Turkey)", "RCT", "Girls 14–16", "Robotics / coding", "Higher STEM-career orientation", "Girls' STEM, secondary age",
-  "Samata — Prakash 2019 (India)", "RCT", "Poor girls 13–16", "Secondary-transition support", "More girls transition; norm shift", "South Asia; senior-secondary transition",
-  "Room to Read GEP — Edmonds 2021 (India)", "RCT", "Girls", "Life skills + mentoring", "Dropout −3.5 to −4.1pp", "Mentoring/pedagogy layer cuts dropout",
-  "Negotiating a Better Future — Ashraf 2025 (Zambia)", "RCT", "Girls ~14", "Negotiation skills", "+0.26 years schooling (10-yr)", "Durable, cheap soft-skills layer",
-  "OLPC / Plan Ceibal — de Melo 2014 (Uruguay)", "Quasi / review", "Pupils", "Laptops (hardware-led)", "Learning ≈ null (−0.05 SD)", "Caution: hardware alone fails → fund pedagogy"
-) |> kable(align = "llllll")
-```
-
-::: {style="font-size:0.55em; color:#7a7a7a;"}
-Effects as reported in each source. Used to inform programme design; the ROI effect size itself comes from the Indonesian evidence on the previous slide.
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+In SUSENAS 2025, girls in PKH households have lower child-marriage rates than other girls (3% vs 4–6%), even though PKH targets poorer households. Consistent with the PKH evidence, though not a causal estimate.
 :::
 
 ## Theory of change
@@ -239,148 +193,235 @@ Effects as reported in each source. Used to inform programme design; the ROI eff
 ```{mermaid}
 %%| fig-width: 13
 flowchart LR
-  A1["Digital &amp; 21st-C skills<br/>content + connectivity"]:::a
-  A2["Girls-responsive pedagogy<br/>teacher training + mentoring"]:::b
-  A3["Ancillary supports<br/>marriage-delay, flexible<br/>learning, safe spaces"]:::c
-  O1["Skills acquired<br/>digital · STEM · socio-emotional"]:::o
-  O2["Stay enrolled,<br/>complete senior secondary"]:::o
-  M1["Transition to<br/>higher ed / work"]:::o
-  R["Lower NEET ·<br/>narrower gender gap"]:::r
-  I["Higher lifetime earnings ·<br/>productivity → 2045 Vision"]:::r
+  T["Target: girls 15–18<br/>poorest households,<br/>Madura districts"]:::t
+  A1["Cash+: link to<br/>PKH / PIP"]:::a
+  A2["Digital and 21st-century<br/>skills in Double Track"]:::a
+  A3["Mentoring and<br/>marriage-delay outreach"]:::a
+  O1["Child marriage<br/>delayed"]:::o
+  O2["Girls stay in school<br/>and complete<br/>senior secondary"]:::o
+  O3["Skills for<br/>work"]:::o
+  R["Transition to work<br/>or higher education:<br/>lower NEET"]:::r
+  I["Higher lifetime<br/>earnings"]:::r
+  T --> A1
+  T --> A2
+  T --> A3
   A1 --> O1
-  A2 --> O1
-  A2 --> O2
+  A1 --> O2
+  A3 --> O1
   A3 --> O2
-  O1 --> M1
-  O2 --> M1
-  M1 --> R --> I
+  A2 --> O3
+  O1 --> O2
+  O2 --> R
+  O3 --> R
+  R --> I
+  classDef t fill:#f4f4f4,stroke:#999,color:#333
   classDef a fill:#eaf6fc,stroke:#1CABE2,color:#00377C
-  classDef b fill:#fde9f2,stroke:#E2007A,color:#a3005a
-  classDef c fill:#f4f4f4,stroke:#999,color:#555
   classDef o fill:#fff7e6,stroke:#FFC20E,color:#7a5b00
   classDef r fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
 ```
 
-::: {style="font-size:0.6em; color:#7a7a7a;"}
-Embedded in Double Track / <em>Tambahan Keterampilan</em>. Measured against the ToR: cost per NEET averted, transition to higher education or work, BCR.
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Each link rests on evidence shown earlier: completion lowers NEET (20 points for girls), cash transfers reduce child marriage (PKH), and skills raise female employment (vocational training). The cash component links girls to existing PKH and PIP entitlements rather than creating a new transfer.
 :::
 
-# 4 · Costing &amp; ROI {.section-divider background-color="#00377C"}
+# 3 · Return on investment {.section-divider background-color="#00377C"}
 
-## Component costs {.smaller}
-
-All figures are **USD per girl, per year of programme exposure**.
+## Key assumptions {.smaller}
 
 ::: {.big-table}
-```{r costing-table}
-suppressPackageStartupMessages(library(knitr))
-ct <- tryCatch(readr::read_csv(file.path("..","output","projections","bcr_costing_table.csv"),
-        show_col_types=FALSE), error=function(e) NULL)
-if (!is.null(ct)) ct |> dplyr::select(-Source) |>
-  kable(align="lrrr", caption="USD per girl per year — Low / Central / High")
+| Assumption | Value | Source |
+|---|---|---|
+| Reduction in girls' NEET | 5 points | PIP attendance effect (+11.4pp), 45% assumed to come from girls who would be NEET |
+| Extra schooling for a girl kept in school | 3 years | Senior-secondary cycle |
+| Earnings gain per year of schooling | 10% | Between SUSENAS consumption (5.6%) and IFLS5 wage (12%) estimates |
+| Female earnings | Rp20 million/year | Below East Java minimum wage 2025, reflecting informal work |
+| Female labour force participation | 52% | Sakernas, East Java |
+| Earnings growth / discount rate | 2% / 3% per year | Career growth; World Bank education default |
+| Programme cost | USD 200 per girl | USD 58 per year for 3 years, plus 15% overhead |
+:::
+
+## Every USD 1 invested returns about USD 1.27 {.smaller}
+
+```{r roi-stats, results='asis'}
+rd <- function(p) tryCatch(readr::read_csv(file.path("..","output",p), show_col_types=FALSE), error=function(e) NULL)
+sc <- rd("projections/bcr_scenarios_table.csv"); be <- rd("projections/bcr_breakeven.csv")
+if (!is.null(sc) && !is.null(be)) {
+  c0 <- sc[sc$Scenario == "Central (5pp)", ]
+  cat(sprintf('<div class="stat-row">
+<div class="stat"><div class="n">USD %s</div><div class="l">return per USD 1 invested</div></div>
+<div class="stat"><div class="n">USD %s</div><div class="l">cost per girl (3 years)</div></div>
+<div class="stat"><div class="n">%s pts</div><div class="l">NEET reduction needed to break even (expected: 5)</div></div>
+<div class="stat"><div class="n">USD %s</div><div class="l">cost per girl kept out of NEET</div></div>
+</div>', c0$BCR, c0$`Cost (USD/girl)`, be$`Break-even NEET reduction (pp)`, c0$`Cost per NEET case averted (USD)`))
+}
+```
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Returns count only girls' higher lifetime earnings. They exclude delayed child marriage, health, intergenerational and fiscal benefits, so they are a lower bound.
+:::
+
+## The return depends mainly on the programme's effect on NEET {.smaller}
+
+::: {.tight-table}
+```{r bcr-table}
+rd <- function(p) tryCatch(readr::read_csv(file.path("..","output",p), show_col_types=FALSE), error=function(e) NULL)
+sc <- rd("projections/bcr_scenarios_table.csv")
+if (!is.null(sc)) knitr::kable(sc, align = "lrrrrr")
 ```
 :::
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
-**Source/method:** Programme- and literature-benchmarked unit costs, using Indonesia-specific sources where available. Training and mentoring costs are annualised from comparable programmes; connectivity assumes shared labs rather than 1:1 devices. Ancillary activities reflect ToR guidance, and overheads follow UNICEF's 10–20% range. Low/central/high estimates capture sourcing uncertainty. Replace with Double Track actuals once provincial financing data are available.
+With the effect held at 5 points and each other assumption varied one at a time, the return stays between USD 0.71 and USD 1.63 per USD 1 (appendix). The programme pays for itself if it reduces girls' NEET by about 4 points.
 :::
 
-## Benefit value chain {.smaller}
+# 4 · Key messages {.section-divider background-color="#00377C"}
 
-::: {.vc-flow}
-<div class="vc-node">NEET reduction (pp)<small>from PIP/PKH evidence</small></div>
-<div class="vc-flow-arrow">→</div>
-<div class="vc-node">Extra years of<br>senior-secondary schooling</div>
-<div class="vc-flow-arrow">→</div>
-<div class="vc-node">Female Mincer return<small>IFLS5 wage-based</small></div>
-<div class="vc-flow-arrow">→</div>
-<div class="vc-node">× wage<br>× LFP<br>× working life</div>
-:::
-
-::: {.vc-result-row}
-<div class="vc-result-box benefit">Benefit, PV per girl</div>
-<div class="vc-flow-arrow">÷</div>
-<div class="vc-result-box cost">Cost = Σ components × exposure × (1+overhead)</div>
-<div class="vc-flow-arrow">=</div>
-<div class="vc-result-box bcr">BCR</div>
-:::
-
-::: {style="font-size:0.58em; color:#7a7a7a; margin-top:1.2em;"}
-The effect chain runs left to right into the benefit; cost is computed independently, and the two combine into the BCR.
-:::
-
-## BCR and cost per NEET case averted {.smaller}
-
-"NEET averted" is a count of girls, not a percentage point: the pp effect multiplied by girls exposed gives an expected number of cases prevented.
-
-::: {.tight-table}
-```{r bcr-table}
-comma_fix <- function(x) {
-  num <- suppressWarnings(as.numeric(gsub(",", "", x)))
-  ifelse(!is.na(num), formatC(num, format="d", big.mark=","), x)
-}
-br <- tryCatch(readr::read_csv(file.path("..","output","projections","bcr_scenarios_table.csv"),
-        show_col_types=FALSE), error=function(e) NULL)
-if (!is.null(br)) br |>
-  dplyr::select(Scenario, `Years edu gained`, `Benefit PV (USD/girl)`,
-                `Cost (USD/girl)`, `NEET cases averted per exposed girl`, BCR,
-                `Cost per full NEET case averted (USD)`) |>
-  dplyr::mutate(`Cost per full NEET case averted (USD)` = comma_fix(`Cost per full NEET case averted (USD)`)) |>
-  kable(align="lrrrrrr")
-```
-:::
-
-::: {style="font-size:0.55em; color:#7a7a7a;"}
-The Low scenario carries the null effect (its confidence interval includes zero), so its BCR is not defined — the return is conditional on a real effect, to be confirmed at pilot.
-:::
-
-## What the BCR counts {.smaller}
-
-::: {.bcr-grid}
-<div class="bcr-col counted">
-<h4>Counted</h4>
-Higher schooling → lifetime earnings premium for girls moved out of NEET, via the female Mincer return applied over the discounted working life.
-</div>
-<div class="bcr-col notcounted">
-<h4>Excluded <span style="font-weight:400;">(so the BCR is a lower bound)</span></h4>
-Intergenerational gains · delayed child marriage · health and productivity spillovers · fiscal returns · broader empowerment
-</div>
-:::
-
-# 5 · Key Findings {.section-divider background-color="#00377C"}
-
-## Key findings {.smaller}
+## Key messages {.smaller}
 
 ::: {.kf-list}
-**1.** Girls 15–24 match boys in school attendance but have close to double the NEET rate (23% vs 13%) and 12 points lower employment. The gap is at the school-to-work transition.
+**1.** Girls in East Java stay in school as long as boys but are close to twice as likely to be NEET, a wider gap than nationally. The gap costs about USD 4.1 billion in forgone lifetime productivity.
 
-**2.** That gap carries a measurable present cost in forgone lifetime productivity, quantified in Section 1 and benchmarked against the national average.
+**2.** Madura is the priority area: NEET is higher for both sexes, and fewer girls are in school.
 
-**3.** Senior-secondary completion is associated with substantially lower NEET for both sexes — the mechanism the programme targets.
+**3.** Child marriage is strongly associated with leaving school and with lower-quality work; poorer girls face higher risk.
 
-**4.** Child marriage and early pregnancy are each strongly associated with higher NEET and lower school attendance, though they account for a minority of NEET cases.
+**4.** Completing senior secondary is associated with 20 points lower NEET for girls, which makes school completion the programme's main lever.
 
-**5.** Girls' NEET fell 4.6 points and child marriage 1.3 points between 2024 and 2025, while attendance and employment held flat.
-
-**6.** Indonesian evidence (PKH, PIP, vocational training) supports both the skills component and a cash-transfer component, and anchors the ROI model without cross-country extrapolation.
-
-**7.** Open items pending external data: disability (2023 SUSENAS), Sakernas wage microdata, higher-education field of study (PDDikti), and the 2025 expenditure module for poverty analysis.
+**5.** A package of skills, mentoring and links to PKH/PIP costing about USD 200 per girl returns about USD 1.27 per USD 1 on earnings alone, and pays for itself if it reduces girls' NEET by about 4 points.
 :::
 
 # Appendix {.section-divider background-color="#00377C"}
 
-## Data and sample {.smaller}
+## Regression results: child marriage and outcomes {.smaller}
 
-::: {style="font-size:0.84em"}
-**Source.** SUSENAS Maret 2025, East Java (province 35) — 98,738 individuals; adolescents 15–24: **12,599** (6,060 girls). Survey-weighted, PSU/strata-clustered (`WEIND`, `PSU`, `STRATA`). SUSENAS Maret 2024 retained for the year-on-year comparison.
+::: {.tight-table}
+```{r marriage-tests}
+rd <- function(p) tryCatch(readr::read_csv(file.path("..","output",p), show_col_types=FALSE), error=function(e) NULL)
+mt <- rd("models/marriage_tests.csv")
+if (!is.null(mt)) knitr::kable(mt |> dplyr::select(Hypothesis, `Effect (pp)`, SE, p, N), align = "lrrrr")
+```
+:::
 
-**Definitions:**
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Linear-probability models, girls 15–24, survey-weighted, PSU-clustered; controls for age and urban/rural (and poverty when expenditure data is available). Robust to district fixed effects. Association, not causation.
+:::
 
-- **NEET (15–24)** = not currently attending school (`R611`) and not working — built from the activity block (`R703_A` worked, `R703_B` schooled, `R704` temporarily absent from a job).
-- **Sex** `R405` · **age** `R407` · **married before 18** from age at first marriage (`R409`) · **early pregnancy** from age at first pregnancy (Blok XV, ever-married women only).
-- **Educational attainment** from highest certificate held (`R615`).
+## NEET among girls, by district {.smaller}
+```{r f6, results='asis'}
+FIG("f6_neet_by_kabkota_en.png", "60%")
+```
 
-**Note on variable numbering:** the 2025 questionnaire renumbered several variables relative to 2024 (school participation R610→R611, certificate R614→R615, internet R805→R808, pregnancy block 1501→1401) and replaced the single main-activity question with a multi-select block. The 2024 and 2025 cleaning scripts are therefore separate files.
+
+## Digital access and use {.smaller}
+```{r f2, results='asis'}
+FIG("f2_digital_by_area_sex_en.png", "86%")
+```
+
+
+## Early pregnancy and outcomes {.smaller}
+```{r f13, results='asis'}
+FIG("f13_pregnancy_pathway_en.png", "78%")
+```
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Recorded only for ever-married women, so a lower bound. Girls with a first pregnancy before 18 are almost all girls married before 18, so the main deck reports child marriage only.
+:::
+
+## Child marriage and NEET by household PKH receipt {.smaller}
+
+::: {.tight-table}
+```{r pkh}
+rd <- function(p) tryCatch(readr::read_csv(file.path("..","output",p), show_col_types=FALSE), error=function(e) NULL)
+pk <- rd("models/followup_D_pkh.csv")
+if (!is.null(pk)) knitr::kable(pk, align = "llrrr")
+```
+:::
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Girls 15–24, SUSENAS 2025. PKH targets poorer households, so lower rates among recipients are consistent with a protective effect, but are not a causal estimate.
+:::
+
+## Cost components {.smaller}
+
+::: {.big-table}
+```{r costing-table}
+rd <- function(p) tryCatch(readr::read_csv(file.path("..","output",p), show_col_types=FALSE), error=function(e) NULL)
+ct <- rd("projections/bcr_costing_table.csv")
+if (!is.null(ct)) knitr::kable(ct |> dplyr::select(-Source), align = "lr")
+```
+:::
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Programme- and literature-benchmarked unit costs, using Indonesia-specific sources where available. Replace with Double Track actuals once provincial financing data are available.
+:::
+
+## Sensitivity of the return to each assumption {.smaller}
+
+::: {.tight-table}
+```{r tornado}
+rd <- function(p) tryCatch(readr::read_csv(file.path("..","output",p), show_col_types=FALSE), error=function(e) NULL)
+tn <- rd("projections/bcr_tornado.csv")
+if (!is.null(tn)) knitr::kable(tn |> dplyr::select(-spread), align = "lrr")
+```
+:::
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Each assumption varied on its own, others held at central values.
+:::
+
+## What the return counts {.smaller}
+
+::: {.bcr-grid}
+<div class="bcr-col counted">
+<h4>Counted</h4>
+Higher schooling leads to a lifetime earnings premium for girls moved out of NEET, using the female return to schooling over a discounted working life.
+</div>
+<div class="bcr-col notcounted">
+<h4>Excluded <span style="font-weight:400;">(so the return is a lower bound)</span></h4>
+Delayed child marriage · health and productivity spillovers · intergenerational gains · fiscal returns · broader empowerment
+</div>
+:::
+
+## Comparable international evidence {.smaller}
+
+```{r evidence-table}
+tibble::tribble(
+  ~Programme, ~Design, ~"Girls / age", ~Focus, ~"Key result", ~"Fit for East Java",
+  "Adolescent girls' wellbeing, Bergström &amp; Özler 2021", "Review (104 studies)", "Adolescent girls", "Multi-sector interventions", "Integrated packages beat single-sector ones", "Synthesis backbone for the ToC",
+  "NEET in Indonesia, Faizah, Isbah &amp; Azca 2025", "Qualitative", "Youth (gendered)", "Drivers of girls' NEET", "Non-education factors (norms, care, marriage) drive girls' NEET", "Indonesia-specific NEET context",
+  "ELA girls' clubs, Bandiera 2018 (Sierra Leone)", "RCT", "Girls 12–25", "Vocational + life skills", "Enrolment +8.5pp; more income-generating activity", "Closest Skills4Girls-in-Double-Track model",
+  "Female digital-employment bootcamp, Alzúa 2020 (Argentina/Colombia)", "RCT", "Women 18–50", "Coding for employment", "Large coding-skill gains", "Core digital-skills → jobs arm",
+  "Irumi, Näslund-Hadley 2025 (Paraguay)", "RCT", "Pupils", "Computational thinking", "+0.09 SD CT", "Structured CT pedagogy",
+  "Robotics &amp; Coding, Gülen 2025 (Turkey)", "RCT", "Girls 14–16", "Robotics / coding", "Higher STEM-career orientation", "Girls' STEM, secondary age",
+  "Samata, Prakash 2019 (India)", "RCT", "Poor girls 13–16", "Secondary-transition support", "More girls transition; norm shift", "South Asia; senior-secondary transition",
+  "Room to Read GEP, Edmonds 2021 (India)", "RCT", "Girls", "Life skills + mentoring", "Dropout −3.5 to −4.1pp", "Mentoring/pedagogy layer cuts dropout",
+  "Negotiating a Better Future, Ashraf 2025 (Zambia)", "RCT", "Girls ~14", "Negotiation skills", "+0.26 years schooling (10-yr)", "Durable, cheap soft-skills layer",
+  "OLPC / Plan Ceibal, de Melo 2014 (Uruguay)", "Quasi / review", "Pupils", "Laptops (hardware-led)", "Learning ≈ null (−0.05 SD)", "Caution: hardware alone fails → fund pedagogy"
+) |> kable(align = "llllll")
+```
+
+## The Mincer specification {.smaller}
+
+$$\ln(Y_i) = \beta_0 + \beta_1 S_i + \beta_2 S_i^2 + \beta_3 \text{Age}_i + \beta_4 \text{Age}_i^2 + \beta_5 \text{Urban}_i + \varepsilon_i$$
+
+- $Y_i$: monthly wage (IFLS5 earners 20–60) or household per-capita expenditure (SUSENAS)
+- $S_i$: years of schooling, from highest certificate
+- $\beta_1$: return per additional year of schooling
+- $\beta_2$: positive and significant means returns rise with schooling level
+- Weighted, with clustered or robust standard errors
+
+## Data and definitions {.smaller}
+
+::: {style="font-size:0.8em"}
+**Source.** SUSENAS Maret 2025 (all provinces; East Java: 98,738 individuals, 12,599 aged 15–24, of whom 6,060 girls) and SUSENAS Maret 2024 for the trend. Survey-weighted, PSU/strata-clustered.
+
+- **NEET (15–24)**: not attending school (`R611`) and not working (`R703_A`, `R704`).
+- **Married before 18**: age at first marriage (`R409`) under 18.
+- **Senior-secondary completion**: highest certificate (`R615`) at SMA/SMK/MA level or above.
+- **Type of work**: status in main job (`R706`); hours (`R707`).
+- **Madura**: Bangkalan, Sampang, Pamekasan, Sumenep.
+
+The 2025 questionnaire replaced the single main-activity question with a multi-select block, so year-on-year changes partly reflect the new question; comparisons with the rest of Indonesia use the same definition in both places.
 :::
 
 ## Data availability {.smaller}
@@ -388,27 +429,10 @@ Intergenerational gains · delayed child marriage · health and productivity spi
 ::: {.tight-table}
 | Indicator | Status |
 |---|---|
-| NEET, schooling, employment, digital access | Available (2024 and 2025) |
-| Child marriage, early pregnancy | Available; pregnancy is ever-married women only (lower bound) |
-| Expenditure, wealth quintiles, official poverty | **Not in the 2025 merged file** — the consumption module is a separate BPS release, not yet obtained |
-| Wages | Not collected in SUSENAS; IFLS5 used for the Mincer return |
-| Disability | Not in the 2024 or 2025 KOR extract; available in SUSENAS 2023 |
-| Higher-education field of study | Not collected in SUSENAS; PDDikti is the source |
-| Programme costs | Pending from the provincial government |
-:::
-
-## The Mincer specification {.smaller}
-
-Returns to schooling are estimated as:
-
-$$\ln(Y_i) = \beta_0 + \beta_1 S_i + \beta_2 S_i^2 + \beta_3 \text{Age}_i + \beta_4 \text{Age}_i^2 + \beta_5 \text{Urban}_i + \varepsilon_i$$
-
-- $Y_i$ — monthly wage (IFLS5 earners 20–60)
-- $S_i$ — years of schooling, from highest certificate attained
-- $\beta_1$ — the return per additional year of schooling
-- $\beta_2$ — the quadratic term; positive and significant indicates returns that rise with schooling level
-- Estimated weighted, with robust standard errors
-
-::: {style="font-size:0.55em; color:#7a7a7a;"}
-A consumption-based version of the same specification (using SUSENAS per-capita expenditure in place of wages) is available once the 2025 expenditure module is obtained; the 2024 estimate was +5.6%/yr for women, +5.2%/yr for men, with significant convexity.
+| NEET, schooling, employment, child marriage, digital access | Available, 2024 and 2025 |
+| Expenditure and official poverty | Available for 2024; 2025 consumption module not yet obtained |
+| Disability | Not in 2024 or 2025; available in SUSENAS 2023 |
+| Earnings | Not in SUSENAS; IFLS5 used; Sakernas microdata requested |
+| Higher-education field of study | Not in SUSENAS; PDDikti is the source |
+| Programme districts and costs | Requested from UNICEF and the provincial government |
 :::
