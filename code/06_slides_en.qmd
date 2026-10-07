@@ -424,15 +424,22 @@ $$\ln(c_i) = \beta_0 + \beta_1 S_i + \beta_2 S_i^2 + \beta_3 \text{Age}_i + \bet
 $w$: monthly wage; $c$: household per-capita expenditure; $S$: years of schooling from highest certificate; Exp: potential experience (age minus schooling minus 6). $\beta_1$ is the return per year of schooling (12% for women from wages, 5.6% from consumption); a positive $\beta_2$ in the consumption model means returns rise with schooling level.
 :::
 
-::: {style="font-size:0.58em; color:#7a7a7a;"}
-Neither model controls for region, family background or selection into paid work, so both are associations. The ROI uses 10%, between the two estimates.
-:::
-
-## Data and definitions {.smaller}
+## Data sources {.smaller}
 
 ::: {style="font-size:0.95em"}
-**Source.** SUSENAS Maret 2025 (all provinces; East Java: 98,738 individuals, 12,599 aged 15–24, of whom 6,060 girls) and SUSENAS Maret 2024 for the trend. Survey-weighted, PSU/strata-clustered.
+- **SUSENAS Maret 2025** (BPS): NEET, school attendance and completion, child marriage, early pregnancy, type of work and hours, PKH receipt and digital access, for East Java and all provinces. East Java: 98,738 individuals, 12,599 aged 15–24, of whom 6,060 girls.
+- **SUSENAS Maret 2024** (BPS): the 2024 comparison, and per-capita expenditure for the consumption-based return to schooling.
+- **IFLS5 2014/15**: wages for the wage-based return to schooling.
+- **Sakernas** (BPS): female labour force participation in East Java.
+- **UMP Jawa Timur 2025**: benchmark for female earnings.
+- **Published evaluations** of PKH, PIP and vocational training: the programme effect used in the return on investment.
 
+All SUSENAS estimates are survey-weighted, with PSU/strata-clustered standard errors.
+:::
+
+## Definitions {.smaller}
+
+::: {style="font-size:0.95em"}
 - **NEET (15–24)**: not attending school (`R611`) and not working (`R703_A`, `R704`).
 - **Married before 18**: age at first marriage (`R409`) under 18.
 - **Senior-secondary completion**: highest certificate (`R615`) at SMA/SMK/MA level or above.
@@ -440,17 +447,4 @@ Neither model controls for region, family background or selection into paid work
 - **Madura**: Bangkalan, Sampang, Pamekasan, Sumenep.
 
 The 2025 questionnaire replaced the single main-activity question with a multi-select block, so year-on-year changes partly reflect the new question; comparisons with the rest of Indonesia use the same definition in both places.
-:::
-
-## Data availability {.smaller}
-
-::: {.tight-table}
-| Indicator | Status |
-|---|---|
-| NEET, schooling, employment, child marriage, digital access | Available, 2024 and 2025 |
-| Expenditure and official poverty | Available for 2024; 2025 consumption module not yet obtained |
-| Disability | Not in 2024 or 2025; available in SUSENAS 2023 |
-| Earnings | Not in SUSENAS; IFLS5 used; Sakernas microdata requested |
-| Higher-education field of study | Not in SUSENAS; PDDikti is the source |
-| Programme districts and costs | Requested from UNICEF and the provincial government |
 :::
