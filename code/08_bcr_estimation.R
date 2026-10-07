@@ -21,14 +21,25 @@ IDR_PER_USD <- 15800   # ~2024 average; adjust as needed
 #    Stacking every worst case against every best case is what produced the
 #    earlier 0.03-18 BCR range, which no real programme would ever face.
 # =============================================================================
+# Return to schooling read from 04b: central = women, model (4) region + parents'
+# education + selection; high = women, model (2) region only; low = SUSENAS consumption.
+MINC_C <- 0.096; MINC_H <- 0.122
+mc_path <- here::here("output","models","mincer_ifls_controls.csv")
+if (file.exists(mc_path)) {
+  mc <- read_csv(mc_path, show_col_types = FALSE) |> filter(Sex == "Women")
+  v4 <- mc$`Return per year`[grepl("^\\(4\\)", mc$Model)]; v2 <- mc$`Return per year`[grepl("^\\(2\\)", mc$Model)]
+  if (length(v4)) MINC_C <- v4[1]
+  if (length(v2)) MINC_H <- max(v2[1], MINC_C)
+}
+message(sprintf("Return to schooling used: central %.1f%%, high %.1f%%, low 5.6%%", 100*MINC_C, 100*MINC_H))
 A <- tribble(
   ~Parameter, ~Low, ~Central, ~High, ~Unit, ~Source,
   "NEET reduction per exposed girl", 0.025, 0.050, 0.075, "share (pp/100)",
     "Central: PIP attendance +11.4pp (Ulfa & Rezki 2024) x 0.45 pass-through to NEET. Band = 0.5x to 1.5x central.",
   "Extra years schooling if retained", 3, 3, 3, "years",
     "Full senior-secondary cycle (fixed by programme design)",
-  "Mincer return per year of edu", 0.056, 0.096, 0.122, "share of earnings",
-    "Central 9.6%: IFLS5 female wage return with urban, province fixed effects and Heckman selection correction (04b). Low: SUSENAS 2024 consumption return (5.6%). High: IFLS5 with region controls only (12.2%)",
+  "Mincer return per year of edu", 0.056, MINC_C, MINC_H, "share of earnings",
+    "Central: IFLS5 female wage return with urban, province fixed effects, parents' education and Heckman selection (04b, model 4). High: region controls only (model 2). Low: SUSENAS 2024 consumption return (5.6%)",
   "Female annual wage (East Java)", 15e6, 20e6, 25e6, "IDR/yr",
     "Central Rp1.67m/month: below UMP Jawa Timur 2025 (~Rp2.31m) to reflect informal work; Sakernas national female mean Rp2.61m (Feb 2025)",
   "Female labour force participation", 0.45, 0.52, 0.60, "share", "BPS Sakernas, East Java female LFPR",

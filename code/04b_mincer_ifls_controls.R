@@ -53,29 +53,24 @@ ar <- rd("hh14_bk_dta", ar_file)
 cat("Household roster age variable: ar09 (", lab(ar$ar09), ")\n")
 kids <- ar |> group_by(hhid14) |> summarise(kids_u5 = sum(ar09 < 5, na.rm = TRUE), .groups = "drop")
 
-# ---- family background: father's and mother's education -------------------
-# IFLS5 variable names for parents' schooling differ by module, so search the
-# Book 3A/3B files for variables whose labels mention father/mother AND education.
-find_parent <- function(who) {
-  pat_who <- if (who == "father") "father|ayah|bapak" else "mother|ibu"
-  for (b in c("hh14_b3b_dta","hh14_b3a_dta")) for (f in list.files(file.path(IFLS, b), pattern = "\\.dta$")) {
-    x <- read_dta(file.path(IFLS, b, f), n_max = 5)
-    if (!"pidlink" %in% names(x)) next
-    hits <- names(x)[sapply(names(x), function(v) { l <- tolower(lab(x[[v]]))
-      grepl(pat_who, l) && grepl("educ|school|pendidikan|sekolah", l) })]
-    if (length(hits)) return(list(file = file.path(b, f), var = hits[1], label = lab(x[[hits[1]]])))
-  }
-  NULL
-}
-fa <- find_parent("father"); mo <- find_parent("mother")
-bg <- tibble(pidlink = character())
-if (!is.null(fa) && !is.null(mo)) {
-  cat("Family background: father =", fa$var, "in", fa$file, "(", fa$label, ")\n")
-  cat("                   mother =", mo$var, "in", mo$file, "(", mo$label, ")\n")
-  fx <- rd(dirname(fa$file), basename(fa$file)); mx <- rd(dirname(mo$file), basename(mo$file))
-  bg <- full_join(tibble(pidlink = fx$pidlink, fedu = fx[[fa$var]]) |> distinct(pidlink, .keep_all = TRUE),
-                  tibble(pidlink = mx$pidlink, medu = mx[[mo$var]]) |> distinct(pidlink, .keep_all = TRUE), by = "pidlink")
-} else cat("Family background: parents' education variables NOT found automatically; model (3) will be skipped.\n")
+# ---- family background: parents' education (Book 3B, section BA) ---------
+# b3b_ba0 has one row per parent per respondent: ba04x = parent type,
+# ba07a = parent ever attended school, ba08 = parent's highest level.
+ba <- read_dta(file.path(IFLS, "hh14_b3b_dta", "b3b_ba0.dta"))
+ptype  <- tolower(as.character(haven::as_factor(ba$ba04x)))
+school <- tolower(as.character(haven::as_factor(ba$ba07a)))
+cat("Parent types in b3b_ba0 (ba04x):\n"); print(table(ptype, useNA = "ifany"))
+pe <- tibble(pidlink = ba$pidlink, ptype,
+             edu = case_when(grepl("^no|^3|tidak", school) ~ 0,            # never attended school
+                             !is.na(as.numeric(ba$ba08)) ~ as.numeric(ba$ba08),
+                             TRUE ~ NA_real_))
+pick <- function(pat) pe |> filter(grepl(pat, ptype), !grepl("step|tiri|in-law|mertua|adopt|angkat", ptype)) |>
+  distinct(pidlink, .keep_all = TRUE)
+bg <- full_join(pick("father|bapak|ayah") |> transmute(pidlink, fedu = edu),
+                pick("mother|ibu")        |> transmute(pidlink, medu = edu), by = "pidlink")
+cat(sprintf("Parents' education matched for %s respondents (father known: %.0f%%, mother known: %.0f%%)\n",
+    format(nrow(bg), big.mark = ","), 100 * mean(!is.na(bg$fedu)), 100 * mean(!is.na(bg$medu))))
+if (nrow(bg) == 0) cat("WARNING: no father/mother rows matched; check the parent-type table above.\n")
 
 # ---- assemble: all adults 20-60 with schooling (workers and non-workers) ---
 a <- cov |> left_join(edu, "pidlink") |> left_join(wag, "pidlink") |> left_join(wt, "pidlink") |>

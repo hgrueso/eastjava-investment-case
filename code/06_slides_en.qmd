@@ -83,6 +83,14 @@ FIG <- function(file, width = "90%") {
   else
     cat("::: {.placeholder}\n<span class='ph-tag'>\u25a2 pending data</span><br>Figure pending: run the corresponding script (see README) to generate it.\n:::\n")
 }
+.rdc <- function(p) tryCatch(readr::read_csv(file.path("..","output",p), col_types = readr::cols(.default = "c")), error = function(e) NULL)
+.sc <- .rdc("projections/bcr_scenarios_table.csv")
+BCR_C <- if (!is.null(.sc)) .sc$BCR[.sc$Scenario == "Central (5pp)"] else "1.22"
+.mc <- .rdc("models/mincer_ifls_controls.csv")
+MINCER_C <- if (!is.null(.mc)) { v <- .mc$`Return per year`[.mc$Sex == "Women" & grepl("^\\(4\\)", .mc$Model)]; sprintf("%.1f%%", 100 * as.numeric(v[1])) } else "9.6%"
+.tn <- .rdc("projections/bcr_tornado.csv")
+if (!is.null(.tn)) { .o <- .tn[!grepl("NEET", .tn$Parameter), ]; .v <- as.numeric(c(.o$`BCR at low value`, .o$`BCR at high value`))
+  RANGE_LO <- sprintf("%.2f", min(.v)); RANGE_HI <- sprintf("%.2f", max(.v)) } else { RANGE_LO <- "0.71"; RANGE_HI <- "1.57" }
 TAB <- file.path("..", "output", "tables", "t8_target_funnel.csv")
 ```
 
@@ -236,14 +244,14 @@ Each link rests on evidence shown earlier: completion lowers NEET (20 points for
 |---|---|---|
 | Reduction in girls' NEET | 5 points | PIP attendance effect (+11.4pp), 45% assumed to come from girls who would be NEET |
 | Extra schooling for a girl kept in school | 3 years | Senior-secondary cycle |
-| Earnings gain per year of schooling | 9.6% | IFLS5 wage return for women, controlling for region and selection into paid work |
+| Earnings gain per year of schooling | `r MINCER_C` | IFLS5 wage return for women, controlling for region, parents' education and selection into paid work |
 | Female earnings | Rp20 million/year | Below East Java minimum wage 2025, reflecting informal work |
 | Female labour force participation | 52% | Sakernas, East Java |
 | Earnings growth / discount rate | 2% / 3% per year | Career growth; World Bank education default |
 | Programme cost | USD 200 per girl | USD 58 per year for 3 years, plus 15% overhead |
 :::
 
-## Every USD 1 invested returns about USD 1.22 {.smaller}
+## Every USD 1 invested returns about USD `r BCR_C` {.smaller}
 
 ::: {.vmid}
 ```{r roi-stats, results='asis'}
@@ -279,7 +287,7 @@ if (!is.null(sc)) knitr::kable(sc, align = "lrrrrr")
 :::
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
-With the effect held at 5 points and each other assumption varied one at a time, the return stays between USD 0.71 and USD 1.57 per USD 1 (appendix). The programme pays for itself if it reduces girls' NEET by about 4 points.
+With the effect held at 5 points and each other assumption varied one at a time, the return stays between USD `r RANGE_LO` and USD `r RANGE_HI` per USD 1 (appendix). The programme pays for itself if it reduces girls' NEET by about 4 points.
 :::
 
 # 4 · Key messages {.section-divider background-color="#00377C"}
@@ -295,7 +303,7 @@ With the effect held at 5 points and each other assumption varied one at a time,
 
 **4.** Completing senior secondary is associated with 20 points lower NEET for girls, which makes school completion the programme's main lever.
 
-**5.** A package of skills, mentoring and links to PKH/PIP costing about USD 200 per girl returns about USD 1.22 per USD 1 on earnings alone, and pays for itself if it reduces girls' NEET by about 4 points.
+**5.** A package of skills, mentoring and links to PKH/PIP costing about USD 200 per girl returns about USD `r BCR_C` per USD 1 on earnings alone, and pays for itself if it reduces girls' NEET by about 4 points.
 :::
 
 # Appendix {.section-divider background-color="#00377C"}
@@ -415,9 +423,9 @@ tibble::tribble(
 ::: {style="font-size:0.8em"}
 **Wage-based** (IFLS5 2014/15, adults 20–60, estimated separately for women and men, weighted):
 
-$$\ln(w_i) = \beta_0 + \beta_1 S_i + \beta_2 \text{Exp}_i + \beta_3 \text{Exp}_i^2 + \beta_4 \text{Urban}_i + \gamma_p + \delta \lambda_i + \varepsilon_i$$
+$$\ln(w_i) = \beta_0 + \beta_1 S_i + \beta_2 \text{Exp}_i + \beta_3 \text{Exp}_i^2 + \beta_4 \text{Urban}_i + \gamma_p + \phi_f + \phi_m + \delta \lambda_i + \varepsilon_i$$
 
-$w$: monthly wage; $S$: years of schooling; Exp: potential experience (age minus schooling minus 6); $\gamma_p$: province fixed effects; $\lambda$: selection term from a first-stage model of working, in which children under 5 in the household predict whether a woman works but not her wage (Heckman two-step).
+$w$: monthly wage; $S$: years of schooling; Exp: potential experience (age minus schooling minus 6); $\gamma_p$: province fixed effects; $\phi_f$, $\phi_m$: father's and mother's education (fixed effects); $\lambda$: selection term from a first-stage model of working, in which children under 5 in the household predict whether a woman works but not her wage (Heckman two-step).
 :::
 
 ::: {.tight-table}
@@ -430,7 +438,7 @@ if (!is.null(mc)) knitr::kable(mc |> dplyr::mutate(`Return per year` = sprintf("
 :::
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
-The ROI uses the women's estimate with region and selection controls (9.6%). The consumption-based return from SUSENAS 2024 (5.6% for women; household per-capita expenditure regressed on schooling, schooling², age, age² and urban) is the low case in the sensitivity analysis.
+The ROI uses the women's estimate with all controls (model 4, `r MINCER_C`). The consumption-based return from SUSENAS 2024 (5.6% for women; household per-capita expenditure regressed on schooling, schooling², age, age² and urban) is the low case in the sensitivity analysis.
 :::
 
 ## Data sources {.smaller}
