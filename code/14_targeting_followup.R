@@ -70,7 +70,7 @@ f20 <- ggplot(fA, aes(region, rate, fill = region)) +
   geom_text(aes(y = rate + 1.96*se, label = scales::percent(rate, accuracy = 1)), vjust = -0.7, size = 3.6, colour = GREY_DARK) +
   facet_wrap(~outcome, scales = "free_y") +
   scale_fill_manual(values = c("Madura" = ACCENT_GIRL, "Rest of East Java" = UNICEF_DARK)) +
-  scale_y_continuous(labels = scales::percent_format(1), expand = expansion(mult = c(0, .22))) +
+  scale_y_continuous(labels = scales::percent_format(1), breaks = scales::breaks_pretty(n = 4), expand = expansion(mult = c(0, .22))) +
   labs(x = NULL, y = NULL, subtitle = "Girls 15-24: Madura (Bangkalan, Sampang, Pamekasan, Sumenep) vs rest of East Java",
        caption = "SUSENAS Maret 2025, survey-weighted; 95% CIs") +
   theme_minimal(base_size = 13) +

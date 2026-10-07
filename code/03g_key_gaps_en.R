@@ -44,7 +44,7 @@ f1a <- ggplot(dat, aes(outcome, estimate, fill = sex)) +
   scale_y_continuous(labels = scales::percent_format(1),
                      expand = expansion(mult = c(0, .20))) +
   labs(x = NULL, y = NULL,
-       subtitle = "Girls match boys in school — but carry ~2× the NEET rate and far lower employment",
+       subtitle = "Adolescents 15–24, by sex",
        caption = attr(ado,"vintage")) +
   theme_minimal(base_size = 13) +
   theme(panel.grid.major.x = element_blank(),

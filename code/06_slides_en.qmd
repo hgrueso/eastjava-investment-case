@@ -57,7 +57,10 @@ format:
         .toc-grid { font-size:.9em; line-height:1.6; margin-top:1.2em; }
         .toc-grid p { margin-bottom:.9em; }
         .toc-grid b { color:#00377C; }
-        .kf-list { font-size:.68em; line-height:1.85; }
+        .kf-list { font-size:.9em; line-height:1.4; }
+        .kf-list p { margin-bottom:.7em; }
+        .reveal h2 { font-size:1.25em !important; line-height:1.15 !important; }
+        .vmid { margin-top:2.2em; }
         .kf-list b { color:#E2007A; }
         .stat-row { display:flex; justify-content:center; gap:1em; margin-top:1em; }
         .stat { flex:1; text-align:center; background:#f6f8fa; border-radius:12px; padding:.8em .4em; }
@@ -78,7 +81,7 @@ FIG <- function(file, width = "90%") {
   if (file.exists(p))
     cat(sprintf("![](%s){fig-align=\"center\" width=%s}\n", p, width))
   else
-    cat("::: {.placeholder}\n<span class='ph-tag'>\u25a2 pending data</span><br>Figure pending — run the corresponding script (see README) to generate it.\n:::\n")
+    cat("::: {.placeholder}\n<span class='ph-tag'>\u25a2 pending data</span><br>Figure pending: run the corresponding script (see README) to generate it.\n:::\n")
 }
 TAB <- file.path("..", "output", "tables", "t8_target_funnel.csv")
 ```
@@ -141,7 +144,7 @@ FIG("f9_marriage_pathway_en.png", "74%")
 ```
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
-Girls married before 18: 59% NEET (others 22%), 8% in school (others 53%). About 4% of girls 15–24 married before 18. Early pregnancy overlaps almost entirely with child marriage in this data, so we report child marriage only. Association, not causation.
+Girls married before 18: 59% NEET (others 22%), 8% in school (others 53%). Their employment rate is not statistically different from other girls (appendix). About 4% of girls 15–24 married before 18. Early pregnancy overlaps almost entirely with child marriage in this data, so we report child marriage only. Association, not causation.
 :::
 
 ## Married girls who work are mostly in unpaid family work or own businesses {.smaller}
@@ -242,9 +245,11 @@ Each link rests on evidence shown earlier: completion lowers NEET (20 points for
 
 ## Every USD 1 invested returns about USD 1.27 {.smaller}
 
+::: {.vmid}
 ```{r roi-stats, results='asis'}
 rd <- function(p) tryCatch(readr::read_csv(file.path("..","output",p), show_col_types=FALSE), error=function(e) NULL)
-sc <- rd("projections/bcr_scenarios_table.csv"); be <- rd("projections/bcr_breakeven.csv")
+rdc <- function(p) tryCatch(readr::read_csv(file.path("..","output",p), col_types = readr::cols(.default = "c")), error=function(e) NULL)
+sc <- rdc("projections/bcr_scenarios_table.csv"); be <- rdc("projections/bcr_breakeven.csv")
 if (!is.null(sc) && !is.null(be)) {
   c0 <- sc[sc$Scenario == "Central (5pp)", ]
   cat(sprintf('<div class="stat-row">
@@ -255,6 +260,7 @@ if (!is.null(sc) && !is.null(be)) {
 </div>', c0$BCR, c0$`Cost (USD/girl)`, be$`Break-even NEET reduction (pp)`, c0$`Cost per NEET case averted (USD)`))
 }
 ```
+:::
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
 Returns count only girls' higher lifetime earnings. They exclude delayed child marriage, health, intergenerational and fiscal benefits, so they are a lower bound.
@@ -262,12 +268,14 @@ Returns count only girls' higher lifetime earnings. They exclude delayed child m
 
 ## The return depends mainly on the programme's effect on NEET {.smaller}
 
+::: {.vmid}
 ::: {.tight-table}
 ```{r bcr-table}
 rd <- function(p) tryCatch(readr::read_csv(file.path("..","output",p), show_col_types=FALSE), error=function(e) NULL)
-sc <- rd("projections/bcr_scenarios_table.csv")
+sc <- tryCatch(readr::read_csv(file.path("..","output","projections/bcr_scenarios_table.csv"), col_types = readr::cols(.default = "c")), error=function(e) NULL)
 if (!is.null(sc)) knitr::kable(sc, align = "lrrrrr")
 ```
+:::
 :::
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
@@ -294,6 +302,7 @@ With the effect held at 5 points and each other assumption varied one at a time,
 
 ## Regression results: child marriage and outcomes {.smaller}
 
+::: {.vmid}
 ::: {.tight-table}
 ```{r marriage-tests}
 rd <- function(p) tryCatch(readr::read_csv(file.path("..","output",p), show_col_types=FALSE), error=function(e) NULL)
@@ -301,9 +310,10 @@ mt <- rd("models/marriage_tests.csv")
 if (!is.null(mt)) knitr::kable(mt |> dplyr::select(Hypothesis, `Effect (pp)`, SE, p, N), align = "lrrrr")
 ```
 :::
+:::
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
-Linear-probability models, girls 15–24, survey-weighted, PSU-clustered; controls for age and urban/rural (and poverty when expenditure data is available). Robust to district fixed effects. Association, not causation.
+Linear-probability models, girls 15–24, survey-weighted, PSU-clustered. **Controls: age and urban/rural.** Poverty is not controlled for because the 2025 expenditure module is not yet available. The association with employment is small and not statistically significant. Association, not causation.
 :::
 
 ## NEET among girls, by district {.smaller}
@@ -400,19 +410,27 @@ tibble::tribble(
 ) |> kable(align = "llllll")
 ```
 
-## The Mincer specification {.smaller}
+## The Mincer specifications {.smaller}
 
-$$\ln(Y_i) = \beta_0 + \beta_1 S_i + \beta_2 S_i^2 + \beta_3 \text{Age}_i + \beta_4 \text{Age}_i^2 + \beta_5 \text{Urban}_i + \varepsilon_i$$
+::: {style="font-size:0.85em"}
+**Wage-based** (IFLS5 2014/15, wage earners 20–60, estimated separately for women and men, weighted):
 
-- $Y_i$: monthly wage (IFLS5 earners 20–60) or household per-capita expenditure (SUSENAS)
-- $S_i$: years of schooling, from highest certificate
-- $\beta_1$: return per additional year of schooling
-- $\beta_2$: positive and significant means returns rise with schooling level
-- Weighted, with clustered or robust standard errors
+$$\ln(w_i) = \beta_0 + \beta_1 S_i + \beta_2 \text{Exp}_i + \beta_3 \text{Exp}_i^2 + \varepsilon_i$$
+
+**Consumption-based** (SUSENAS 2024, adults 25–54, survey-weighted, PSU-clustered):
+
+$$\ln(c_i) = \beta_0 + \beta_1 S_i + \beta_2 S_i^2 + \beta_3 \text{Age}_i + \beta_4 \text{Age}_i^2 + \beta_5 \text{Urban}_i + \varepsilon_i$$
+
+$w$: monthly wage; $c$: household per-capita expenditure; $S$: years of schooling from highest certificate; Exp: potential experience (age minus schooling minus 6). $\beta_1$ is the return per year of schooling (12% for women from wages, 5.6% from consumption); a positive $\beta_2$ in the consumption model means returns rise with schooling level.
+:::
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+Neither model controls for region, family background or selection into paid work, so both are associations. The ROI uses 10%, between the two estimates.
+:::
 
 ## Data and definitions {.smaller}
 
-::: {style="font-size:0.8em"}
+::: {style="font-size:0.95em"}
 **Source.** SUSENAS Maret 2025 (all provinces; East Java: 98,738 individuals, 12,599 aged 15–24, of whom 6,060 girls) and SUSENAS Maret 2024 for the trend. Survey-weighted, PSU/strata-clustered.
 
 - **NEET (15–24)**: not attending school (`R611`) and not working (`R703_A`, `R704`).

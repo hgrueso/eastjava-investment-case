@@ -28,8 +28,8 @@ one <- function(v){
   svyby(as.formula(paste0("~`",v,"`")), ~grp, des, svymean, na.rm=TRUE) |>
     as.data.frame() |> setNames(c("grp","estimate","se")) |> mutate(outcome=v)
 }
-dat <- bind_rows(lapply(c("NEET","In school","Employed"), one)) |>
-  mutate(outcome = factor(outcome, c("NEET","In school","Employed")),
+dat <- bind_rows(lapply(c("NEET","In school"), one)) |>
+  mutate(outcome = factor(outcome, c("NEET","In school")),
          lo = pmax(0,estimate-1.96*se), hi = estimate+1.96*se)
 
 pal <- c("Not married < 18" = UNICEF_BLUE, "Married < 18" = ACCENT_GIRL)
