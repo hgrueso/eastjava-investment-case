@@ -78,15 +78,48 @@ f <- ggplot(B |> filter(sex == "Girls"), aes(factor(year), rate/100, colour = un
 save_fig(f, "f25_secondary_enrolment_trend_en", width = 8, height = 5)
 
 # ===== C. earnings by type of work, young women (IFLS5) =====
+# Employees and casual workers report wages (tk25a1); the self-employed report
+# net profit in a separate question (tk26a*), so each type uses its own measure.
 IFLS <- here::here("data","IFLS5")
 cov <- read_dta(file.path(IFLS,"hh14_b3a_dta","b3a_cov.dta")); tk <- read_dta(file.path(IFLS,"hh14_b3a_dta","b3a_tk2.dta"))
-st <- grep("^tk24a", names(tk), value = TRUE)[1]
-cat("\nIFLS5 work-status variable:", st, "| labels:\n"); print(attr(tk[[st]], "labels"))
+st <- grep("^tk24a$", names(tk), value = TRUE)[1]
+pf <- c(grep("^tk26a1$", names(tk), value = TRUE), grep("^tk26a", names(tk), value = TRUE))[1]
+lb <- function(v) { a <- attr(tk[[v]], "label"); if (is.null(a)) "" else a }
+cat("\nIFLS5 status:", st, "| wage: tk25a1 (", lb("tk25a1"), ") | profit:", pf, "(", if (!is.na(pf)) lb(pf) else "not found", ")\n")
 yw <- tibble(pidlink = cov$pidlink, age = num(cov$age), female = cov$sex == 3) |>
-  inner_join(tibble(pidlink = tk$pidlink, status = as.character(haven::as_factor(tk[[st]])), earn = num(tk$tk25a1)), by = "pidlink") |>
-  filter(female, age >= 15, age <= 30, !is.na(status))
-C <- yw |> group_by(status) |> summarise(n = n(), `Share with earnings reported` = round(100*mean(!is.na(earn) & earn > 0),0),
-  `Median monthly earnings (IDR)` = round(median(earn[earn > 0], na.rm = TRUE)), .groups = "drop") |> arrange(desc(n))
+  inner_join(tibble(pidlink = tk$pidlink, code = num(tk[[st]]), wage = num(tk$tk25a1),
+                    profit = if (!is.na(pf)) num(tk[[pf]]) else NA_real_), by = "pidlink") |>
+  filter(female, age >= 15, age <= 30, code %in% 1:8) |>
+  mutate(type = case_when(code %in% 4:5 ~ "Employee (wage)", code %in% 1:3 ~ "Own business",
+                          code %in% 7:8 ~ "Casual worker", code == 6 ~ "Unpaid family worker"),
+         earn = case_when(type == "Own business" ~ profit, type == "Unpaid family worker" ~ 0, TRUE ~ wage),
+         earn = ifelse(earn < 0 | earn > 9e8, NA, earn))
+C <- yw |> group_by(Type = type) |>
+  summarise(`Women 15-30` = n(), `With earnings reported` = sum(!is.na(earn)),
+            `Median monthly earnings (IDR)` = median(earn, na.rm = TRUE), .groups = "drop") |>
+  arrange(desc(`Median monthly earnings (IDR)`))
 write_csv(C, file.path(MOD, "followup2_C_earnings_by_status_ifls.csv"))
-cat("\n=== C. Women 15-30, IFLS5 (2014/15 prices): earnings by work status ===\n"); print(as.data.frame(C))
+cat("\n=== C. Women 15-30, IFLS5 (2014/15 prices): median monthly earnings by type of work ===\n"); print(as.data.frame(C))
+
+# Redraw f21 (type of work by child-marriage status) with median earnings in the legend
+B <- read_csv(file.path(MOD, "followup_B_employment_type.csv"), show_col_types = FALSE)
+med <- setNames(C$`Median monthly earnings (IDR)`, C$Type)
+lab <- function(t) { m <- med[t]
+  if (t == "Unpaid family worker") return(paste0(t, ": no earnings"))
+  if (is.na(m)) return(t); paste0(t, ": Rp", formatC(m/1e6, format = "f", digits = 2), "m/month") }
+types <- c("Employee (wage)","Own business","Casual worker","Unpaid family worker")
+labs_t <- setNames(sapply(types, lab), types)
+f21 <- ggplot(B, aes(group, share, fill = type)) +
+  geom_col(width = .6) +
+  geom_text(aes(label = ifelse(share >= 5, paste0(round(share), "%"), "")),
+            position = position_stack(vjust = .5), colour = "white", size = 3.6, fontface = "bold") +
+  scale_fill_manual(values = c("Employee (wage)" = UNICEF_DARK, "Own business" = "#1CABE2",
+                               "Casual worker" = "#7a5b00", "Unpaid family worker" = ACCENT_GIRL),
+                    labels = labs_t, breaks = types, name = NULL) +
+  guides(fill = guide_legend(nrow = 2)) +
+  labs(x = NULL, y = "% of employed girls",
+       subtitle = "Type of work among employed girls 15-24, by child-marriage status",
+       caption = "SUSENAS Maret 2025, East Java, survey-weighted. Legend: median monthly earnings of women 15-30 by type of work, IFLS5 (2014/15 prices).") +
+  theme_ej
+save_fig(f21, "f21_employment_type_en", width = 8.5, height = 5.6)
 message("15 done")

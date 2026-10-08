@@ -61,6 +61,15 @@ format:
         .kf-list p { margin-bottom:.7em; }
         .reveal h2 { font-size:1.25em !important; line-height:1.15 !important; }
         .vmid { margin-top:2.2em; }
+        .reveal .assump-table table { font-size:.6em; border-collapse:collapse; width:100%; }
+        .reveal .assump-table td, .reveal .assump-table th { padding:3px 8px; }
+        .reveal .steps-table table { font-size:.8em; border-collapse:collapse; width:100%; }
+        .reveal .steps-table td, .reveal .steps-table th { padding:5px 8px; }
+        .reveal .steps-table td:last-child, .reveal .steps-table th:last-child { padding-left:3em; padding-right:1.5em; white-space:nowrap; }
+        .reveal .center-th table th { text-align:center !important; vertical-align:bottom; }
+        .reveal section.bigtitle h2 { font-size:1.6em !important; }
+        .reveal .refs { column-count:2; column-gap:2.2em; font-size:.47em; line-height:1.3; }
+        .reveal .refs p { margin:0 0 .5em; padding-left:1.4em; text-indent:-1.4em; }
         .kf-list b { color:#E2007A; }
         .stat-row { display:flex; justify-content:center; gap:1em; margin-top:1em; }
         .stat { flex:1; text-align:center; background:#f6f8fa; border-radius:12px; padding:.8em .4em; }
@@ -256,7 +265,7 @@ Each arrow rests on evidence from Indonesia: cash transfers reduce girls' child 
 
 ## Key assumptions {.smaller}
 
-::: {.big-table}
+::: {.assump-table}
 | Assumption | Value | Source |
 |---|---|---|
 | Reduction in girls' NEET | 5 points | PIP attendance effect (+11.4pp), 45% assumed to come from girls who would be NEET |
@@ -272,7 +281,7 @@ Each arrow rests on evidence from Indonesia: cash transfers reduce girls' child 
 ## How the return is built {.smaller}
 
 ::: {.vmid}
-::: {.big-table}
+::: {.steps-table}
 ```{r roi-steps}
 st <- tryCatch(readr::read_csv(file.path("..","output","projections","bcr_steps.csv"), col_types = readr::cols(.default = "c")), error = function(e) NULL)
 if (!is.null(st)) knitr::kable(st, align = "lr")
@@ -295,7 +304,7 @@ FIG("f26_roi_bars_en.png", "60%")
 ## Benefit-cost ratio by scenario {.smaller}
 
 ::: {.vmid}
-::: {.tight-table}
+::: {.tight-table .center-th}
 ```{r bcr-table}
 rd <- function(p) tryCatch(readr::read_csv(file.path("..","output",p), show_col_types=FALSE), error=function(e) NULL)
 sc <- tryCatch(readr::read_csv(file.path("..","output","projections/bcr_scenarios_table.csv"), col_types = readr::cols(.default = "c")), error=function(e) NULL)
@@ -310,9 +319,9 @@ The central case is the retention channel; the second row adds the uncertain ski
 
 # 4 · Key messages {.section-divider background-color="#00377C"}
 
-## Key messages {.smaller}
+## Key messages {.smaller .bigtitle}
 
-::: {.kf-list style="font-size:.8em;"}
+::: {.kf-list style="font-size:.95em;"}
 **1.** Girls in East Java have the same school attendance rate as boys but are close to twice as likely to be NEET, a wider gap than nationally, costing about USD 4.1 billion in forgone lifetime productivity.
 
 **2.** Completing senior secondary is associated with 20 points lower NEET for girls; child marriage with leaving school and more unpaid family work. Both are concentrated among poorer girls and in Madura.
@@ -320,9 +329,9 @@ The central case is the retention channel; the second row adds the uncertain ski
 **3.** A USD 200-per-girl package returns about USD `r BCR_C` per USD 1 in lifetime earnings from keeping girls in school, before any benefit from skills, delayed marriage or health.
 :::
 
-## Recommendations {.smaller}
+## Policy recommendations {.smaller .bigtitle}
 
-::: {.kf-list style="font-size:.78em;"}
+::: {.kf-list style="font-size:.88em;"}
 **1. Target senior-secondary completion, not enrolment.** Girls already enrol at the same rate as boys; the loss happens at the transition. Set programme targets on completion and the first job, measured through SUSENAS.
 
 **2. Start in Madura and the poorest 40% of households.** NEET is highest and attendance lowest there, and child marriage falls steeply with household wealth, so each dollar does most there.
@@ -372,14 +381,15 @@ Linear-probability models, girls 15–24, survey-weighted, PSU-clustered; contro
 ::: {.vmid}
 ::: {.tight-table}
 ```{r earnings-status}
-es <- tryCatch(readr::read_csv(file.path("..","output","models","followup2_C_earnings_by_status_ifls.csv"), col_types = readr::cols(.default = "c")), error = function(e) NULL)
-if (!is.null(es)) knitr::kable(es, align = "lrrr")
+es <- tryCatch(readr::read_csv(file.path("..","output","models","followup2_C_earnings_by_status_ifls.csv"), show_col_types = FALSE), error = function(e) NULL)
+if (!is.null(es)) knitr::kable(es |> dplyr::mutate(`Median monthly earnings (IDR)` = ifelse(is.na(`Median monthly earnings (IDR)`), "n/a",
+                                 formatC(`Median monthly earnings (IDR)`, format = "d", big.mark = ","))), align = "lrrr")
 ```
 :::
 :::
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
-Women 15–30, IFLS5 (2014/15 prices). SUSENAS collects no earnings. Unpaid family workers have no earnings by definition.
+Women 15–30, IFLS5 (2014/15 prices). SUSENAS collects no earnings. Wages for employees and casual workers; net profit for own businesses; unpaid family workers have no earnings by definition.
 :::
 
 ## NEET among girls, by district {.smaller}
@@ -536,8 +546,36 @@ Several variables were renumbered between the 2024 and 2025 questionnaires (scho
 
 ## References {.smaller}
 
-::: {style="font-size:0.5em; line-height:1.35"}
-Aramburu, Goicoechea and Mobarak (2021). Coding Bootcamps for Female Digital Employment: Evidence from an RCT in Argentina and Colombia. World Bank. · Ashraf et al. (2025). Ten Years of Relational Power. · Bandiera et al. (2018). The Economic Lives of Young Women in the Time of Ebola. · Bergstrom and Özler (2021). Improving the Well-Being of Adolescent Girls in Developing Countries. World Bank. · Caniago et al. (2021), Table 5. · de Melo, Machado and Miranda (2014). The Impact of a One Laptop per Child Program on Learning: Evidence from Uruguay. · Edmonds, Feigenberg and Leight (2021). Advancing the Agency of Adolescent Girls. · Faizah, Isbah and Azca (2025, online; 2026 issue). · Gülen et al. (2025). · Näslund-Hadley et al. (2025). IDB. · Prakash et al. (2019). Samata. · Priebe and Sumarto (2025). PKH and child marriage. · Pritadrajati (2022). Bulletin of Monetary Economics and Banking. · Ulfa and Rezki (2024), Table 4. · BPS, SUSENAS Maret 2024 and 2025; IFLS5 (2014/15); UMP Jawa Timur 2025.
+::: {.refs}
+Aramburu, J., Goicoechea, A. and Mobarak, A.M. (2021). *Coding Bootcamps for Female Digital Employment: Evidence from an RCT in Argentina and Colombia*. World Bank.
 
-Links and table or page references to be completed for each study before circulation.
+Ashraf, N., Bau, N., Low, C. and McGinn, K. (2020). Negotiating a Better Future: How Interpersonal Skills Facilitate Intergenerational Investment. *Quarterly Journal of Economics*, 135(2).
+
+Ashraf, N. et al. (2025). *Ten Years of Relational Power*. Long-run follow-up, American Economic Association.
+
+Bandiera, O., Buehren, N., Goldstein, M., Rasul, I. and Smurra, A. (2018). *The Economic Lives of Young Women in the Time of Ebola: Lessons from an Empowerment Program*. World Bank.
+
+Bergstrom, K. and Özler, B. (2021). *Improving the Well-Being of Adolescent Girls in Developing Countries*. World Bank Policy Research Working Paper.
+
+Caniago, et al. (2021). Programa Indonesia Pintar and girls' senior-secondary enrolment. Universitas Negeri Semarang journal, Table 5.
+
+de Melo, G., Machado, A. and Miranda, A. (2014). *The Impact of a One Laptop per Child Program on Learning: Evidence from Uruguay*. IZA Discussion Paper.
+
+Edmonds, E., Feigenberg, B. and Leight, J. (2021). *Advancing the Agency of Adolescent Girls*. Working paper; main survey estimate.
+
+Faizah, Isbah, M.F. and Azca, M.N. (2025, online; 2026 issue). Gendered transitions and NEET youth in Indonesia. SAGE.
+
+Gülen, S. et al. (2025). Robotics and coding for adolescent girls, Turkey. SAGE.
+
+Näslund-Hadley, E. et al. (2025). *Irumi: computational thinking in early primary, Paraguay*. Inter-American Development Bank.
+
+Prakash, R. et al. (2019). Samata: secondary-school transition for adolescent girls, India. *Journal of Global Health Reports*.
+
+Priebe, J. and Sumarto, S. (2025). Program Keluarga Harapan and child marriage in Indonesia. Elsevier.
+
+Pritadrajati, D. (2022). Vocational and general secondary schooling and labour-market outcomes in Indonesia. *Bulletin of Monetary Economics and Banking*.
+
+Ulfa, R. and Rezki, J.F. (2024). Programa Indonesia Pintar and school participation. Universitas Negeri Semarang journal, Table 4.
+
+**Data.** BPS, Survei Sosial Ekonomi Nasional (SUSENAS) Maret 2024 and Maret 2025. Strauss, J., Witoelar, F. and Sikoki, B. (2016). *The Fifth Wave of the Indonesia Family Life Survey (IFLS5)*. RAND. Upah Minimum Provinsi Jawa Timur 2025.
 :::

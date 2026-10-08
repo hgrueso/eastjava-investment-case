@@ -157,32 +157,4 @@ cat("\n================ HOW THE NUMBER IS BUILT ================\n"); print(as.d
 cat(sprintf("Break-even (retention channel only): pays for itself at a %.1fpp NEET reduction (central assumption: 5pp).\n", breakeven_pp))
 cat("\n================ SENSITIVITY (one parameter at a time) ================\n"); print(as.data.frame(tornado |> select(-spread)))
 
-# ---- ROI figures: cost vs stacked benefit; BCR by scenario with break-even line ----
-suppressPackageStartupMessages(library(ggplot2)); source(here::here("R","utils.R"))
-if (!exists("GREY_DARK")) GREY_DARK <- "#374649"; if (!exists("GREY_MID")) GREY_MID <- "#7A8487"
-ws <- calc(with_skills)
-bars <- tibble(bar = c("Cost","Cost","Benefit","Benefit"),
-               part = c("Programme cost (3 years)","", "Earnings gain from staying in school", "Skills premium, if it held (uncertain)"),
-               usd = c(ws$cost, 0, ws$benefit_ret, ws$benefit_prem)) |> filter(usd > 0)
-f26 <- ggplot(bars, aes(x = factor(bar, c("Cost","Benefit")), y = usd, fill = part)) +
-  geom_col(width = .55) +
-  geom_text(aes(label = paste0("USD ", round(usd))), position = position_stack(vjust = .5), colour = "white", fontface = "bold", size = 4) +
-  scale_fill_manual(values = c("Programme cost (3 years)" = "#E2007A", "Earnings gain from staying in school" = "#00377C",
-                               "Skills premium, if it held (uncertain)" = "#9fc5e8"), name = NULL) +
-  labs(x = NULL, y = "USD per participating girl (present value)",
-       subtitle = "Per participating girl: cost against modelled lifetime benefits",
-       caption = "Retention benefit rests on Indonesian causal evidence; the skills premium is a point estimate that is not statistically significant") +
-  theme_minimal(base_size = 13) + theme(legend.position = "top", panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(),
-                                        plot.subtitle = element_text(colour = GREY_DARK), plot.caption = element_text(colour = GREY_MID, size = 8))
-save_fig(f26, "f26_roi_bars_en", width = 8.5, height = 5.4)
-sb <- tibble(Scenario = c("Retention channel\n(central)", "With 5.6% skills premium\n(uncertain)", "Retention, earnings at\n2025 minimum wage", "Retention, plus Cash+\nstipend for poorest 40%"),
-             BCR = c(base$bcr, ws$bcr, calc(list(`Female annual wage (East Java)` = 2.31e6*12))$bcr, calc(list(`Cash+ stipend cost (optional)` = 46))$bcr))
-f27 <- ggplot(sb, aes(x = factor(Scenario, Scenario), y = BCR)) +
-  geom_col(fill = "#00377C", width = .55) + geom_hline(yintercept = 1, linetype = "dashed", colour = "#E2007A") +
-  annotate("text", x = 4.4, y = 1.06, label = "break-even", colour = "#E2007A", size = 3.4, hjust = 1) +
-  geom_text(aes(label = sprintf("%.2f", BCR)), vjust = -0.6, size = 4, colour = GREY_DARK) +
-  scale_y_continuous(expand = expansion(mult = c(0, .2))) +
-  labs(x = NULL, y = "Benefit-cost ratio", subtitle = "Benefit-cost ratio by scenario") +
-  theme_minimal(base_size = 13) + theme(panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(), plot.subtitle = element_text(colour = GREY_DARK))
-save_fig(f27, "f27_bcr_scenarios_en", width = 8.5, height = 5)
-message("Stage 8 complete -> output/projections/bcr_*.csv, f26, f27")
+message("Stage 8 complete -> output/projections/bcr_*.csv (figures: run 08b_roi_figures.R)")
