@@ -109,6 +109,20 @@ if (!is.null(.tn)) { .o <- .tn[!grepl("NEET|premium", .tn$Parameter), ]; .v <- a
 .en <- .rdc("models/followup2_B_secondary_enrolment.csv")
 .enc <- function(u, s) { if (is.null(.en)) return(NA); r <- .en[.en$unit == u & .en$sex == s, ]
   as.numeric(r$rate[r$year == "2025"]) - as.numeric(r$rate[r$year == "2024"]) }
+.ll <- .rdc("projections/lifetime_loss.csv")
+.llv <- function(m) if (is.null(.ll)) NA else readr::parse_number(.ll$Value[grepl(m, .ll$Metric, fixed = TRUE)][1])
+LOSS_BN <- sprintf("%.1f", .llv("TOTAL forgone lifetime productivity, East Java (USD)") / 1e9)
+LOSS_GIRLS <- format(round(.llv("Excess NEET girls (gap x population)"), -3), big.mark = ",")
+LOSS_PER <- format(round(.llv("PV of forgone lifetime earnings, per excess-NEET girl (USD)"), -2), big.mark = ",")
+.sk <- if (!is.null(.sc)) .sc[grepl("skills earnings premium", .sc$Scenario), ][1, ] else NULL
+.pn <- function(x) readr::parse_number(x)
+RET_B <- if (!is.null(.sk)) .sk$`Retention benefit (USD/girl)` else "242"
+SK_B  <- if (!is.null(.sk)) .sk$`Skills premium benefit (USD/girl)` else "365"
+TOT_B <- if (!is.null(.sk)) .sk$`Total benefit (USD/girl)` else "607"
+COST  <- if (!is.null(.sk)) .sk$`Cost (USD/girl)` else "200"
+SK_ONLY <- sprintf("%.2f", .pn(SK_B) / .pn(COST))
+.mw <- if (!is.null(.sc)) .sc$BCR[grepl("minimum wage", .sc$Scenario)][1] else "1.68"
+BE_PP <- { .be <- .rdc("projections/bcr_breakeven.csv"); if (is.null(.be)) "4.1" else .be$`Break-even NEET reduction (pp)`[1] }
 TAB <- file.path("..", "output", "tables", "t8_target_funnel.csv")
 ```
 
@@ -146,13 +160,13 @@ FIG("f19_national_benchmark_en.png", "76%")
 Girls-minus-boys NEET gap: 10.3 points in East Java against 7.9 points nationally. Same survey, same definition, all provinces.
 :::
 
-## The gap costs an estimated USD 4.1 billion in forgone lifetime productivity {.smaller}
+## The gap costs an estimated USD `r LOSS_BN` billion in forgone lifetime productivity {.smaller}
 ```{r f15, results='asis'}
 FIG("f15_lifetime_loss_en.png", "80%")
 ```
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
-About 288,000 girls are NEET in excess of the boys' rate. Each would be expected to earn about USD 14,100 more over a working lifetime (present value) if she had the boys' NEET rate.
+About `r LOSS_GIRLS` girls are NEET in excess of the boys' rate. Each would be expected to earn about USD `r LOSS_PER` more over a working lifetime (present value) if she had the boys' NEET rate.
 :::
 
 ## Madura has higher NEET for girls and boys, with a similar gender gap {.smaller}
@@ -296,16 +310,23 @@ if (!is.null(st)) knitr::kable(st, align = "lr")
 :::
 :::
 
-## Every USD 1 invested returns about USD `r BCR_C` in lifetime earnings {.smaller}
+## Every USD 1 invested could return up to USD `r BCR_SK` in lifetime earnings {.smaller}
 
+::: {.columns}
+::: {.column width="44%"}
 ```{r f26, results='asis'}
-FIG("f26_roi_bars_en.png", "60%")
+FIG("f26_roi_bars_en.png", "100%")
 ```
-
-::: {.kf-list style="font-size:.74em;"}
-- **For every USD 1 invested, about USD `r BCR_C` comes back as lifetime earnings** of girls kept in school through senior secondary. A benefit-cost ratio, not a fiscal return to government; it counts earnings only and excludes delayed marriage, health and intergenerational benefits.
-- **If the skills component also raised earnings by 5.6%** for every girl who works, the return would be about USD `r BCR_SK`. That estimate comes from vocational schooling in Indonesia and is not statistically significant, so it is a scenario, not the central case.
-- **The USD 200 cost per girl** covers three years of digital content, teacher training, mentoring, shared connectivity and marriage-delay outreach (USD 58 a year), plus 15% overhead. Girls are linked to existing PKH and PIP transfers, which are not an additional cost.
+:::
+::: {.column width="56%"}
+::: {.kf-list style="font-size:.66em; line-height:1.35;"}
+- **Both channels together: USD `r BCR_SK` per USD 1.** USD `r TOT_B` in lifetime earnings per girl against a cost of USD `r COST`.
+- **Conservative view, staying in school only: USD `r BCR_C` per USD 1.** USD `r RET_B` per girl, based on Indonesian causal evidence (PIP). The programme breaks even if it reduces girls' NEET by `r BE_PP` points; the evidence suggests 5. At the 2025 minimum wage this rises to USD `r .mw`.
+- **Skills channel on its own: USD `r SK_ONLY` per USD 1.** USD `r SK_B` per girl if the 5.6% earnings premium for vocational schooling in Indonesia applies; that estimate is not statistically significant, so this is the less conservative part.
+- **Not counted in either:** delayed marriage, health, children's outcomes and fiscal returns. These are benefit-cost ratios, not fiscal returns to government.
+- **The USD `r COST` per girl** covers three years of digital content, teacher training, mentoring, shared connectivity and marriage-delay outreach, plus 15% overhead; PKH and PIP transfers are existing entitlements.
+:::
+:::
 :::
 
 ## Benefit-cost ratio by scenario {.smaller}
@@ -328,22 +349,22 @@ The central case is the retention channel; the second row adds the uncertain ski
 
 ## Key messages {.smaller .bigtitle}
 
-::: {.kf-list style="font-size:.95em;"}
-**1.** Girls in East Java have the same school attendance rate as boys but are close to twice as likely to be NEET, a wider gap than nationally, costing about USD 4.1 billion in forgone lifetime productivity.
+::: {.kf-list style="font-size:.92em;"}
+**1.** Girls in East Java have the same school attendance rate as boys but are close to twice as likely to be NEET, a wider gap than nationally, costing about USD `r LOSS_BN` billion in forgone lifetime productivity.
 
-**2.** Completing senior secondary is associated with 20 points lower NEET for girls; child marriage with leaving school and more unpaid family work. Both are concentrated among poorer girls and in Madura.
+**2.** Completing senior secondary is associated with 20 points lower NEET for girls; child marriage with leaving school and more unpaid family work. NEET is highest in Madura, for girls and boys.
 
-**3.** A USD 200-per-girl package returns about USD `r BCR_C` per USD 1 in lifetime earnings from keeping girls in school, before any benefit from skills, delayed marriage or health.
+**3.** A USD `r COST`-per-girl package returns at least USD `r BCR_C` per USD 1 from keeping girls in school, and up to USD `r BCR_SK` if the skills component raises earnings, before counting delayed marriage or health benefits.
 :::
 
 ## Policy recommendations {.smaller .bigtitle}
 
-::: {.kf-list style="font-size:.88em;"}
-**1. Target senior-secondary completion, not enrolment.** Girls already enrol at the same rate as boys; the loss happens at the transition. Set programme targets on completion and the first job, measured through SUSENAS.
+::: {.kf-list style="font-size:.84em;"}
+**1. Target the transition, not enrolment.** Girls attend school at the same rate as boys, and senior-secondary enrolment rose faster in East Java than elsewhere in 2024–2025, but tertiary enrolment rose more slowly. Set targets on completion and the first job or further study.
 
-**2. Start in Madura and the poorest 40% of households.** NEET is highest and attendance lowest there, and child marriage falls steeply with household wealth, so each dollar does most there.
+**2. Start in Madura and the poorest households.** NEET is highest and attendance lowest in Madura, and child marriage falls with household wealth (2024 data).
 
-**3. Link girls to PKH and PIP rather than creating a new transfer.** Indonesian evidence shows PKH reduces girls' child marriage; linkage uses existing systems. Cost a new stipend only if coverage beyond current entitlements is wanted.
+**3. Link girls to PKH and PIP rather than creating a new transfer.** Indonesian evidence shows PKH reduces girls' child marriage; linkage uses existing systems.
 
 **4. Fund pedagogy and mentoring, not devices.** Internet use is already near universal, and devices alone did not raise learning in Uruguay.
 
@@ -418,6 +439,15 @@ FIG("f13_pregnancy_pathway_en.png", "78%")
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
 Recorded only for ever-married women, so a lower bound. Girls with a first pregnancy before 18 are almost all girls married before 18, so the main deck reports child marriage only.
+:::
+
+## Child marriage by household expenditure, 2024 {.smaller}
+```{r f11w, results='asis'}
+FIG("f11_marriage_by_wealth_2024_en.png", "74%")
+```
+
+::: {style="font-size:0.58em; color:#7a7a7a;"}
+SUSENAS 2024 is the latest year with household expenditure; the 2025 expenditure module has not yet been obtained.
 :::
 
 ## Child marriage and NEET by household PKH receipt {.smaller}

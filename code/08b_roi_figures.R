@@ -23,8 +23,9 @@ f26 <- ggplot(bars, aes(bar, usd, fill = part)) +
                                "Skills premium, if it held (uncertain)" = "#7fb3e0"), name = NULL) +
   labs(x = NULL, y = "USD per participating girl (present value)") +
   theme_minimal(base_size = 13) +
-  theme(legend.position = "right", panel.grid.major.x = element_blank(), panel.grid.minor = element_blank())
-save_fig(f26, "f26_roi_bars_en", width = 9, height = 4.6)
+  guides(fill = guide_legend(ncol = 1)) +
+  theme(legend.position = "bottom", panel.grid.major.x = element_blank(), panel.grid.minor = element_blank())
+save_fig(f26, "f26_roi_bars_en", width = 6, height = 6)
 
 sb <- tibble(Scenario = sc$Scenario, BCR = n(sc$BCR)) |>
   mutate(Scenario = factor(stringr::str_wrap(Scenario, 28), stringr::str_wrap(Scenario, 28)))
