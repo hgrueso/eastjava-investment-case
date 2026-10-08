@@ -164,15 +164,29 @@ print(as.data.frame(D))
 # ===========================================================================
 # E/F. East Java vs national, 2024 and 2025
 # ===========================================================================
-c24 <- c("R101","R404","R405","R407","R409","R610","R612","R704","FWT")
+# 2024 built with the SAME definition as 2025: any work last week (R703_A) or
+# temporarily absent from a job (R705 in 2024 = R704 in 2025), not attending
+# school (R610 in 2024 = R611 in 2025, or R703_B). The earlier version used
+# 2024's main-activity question (R704), a narrower definition of work, which
+# would have overstated the 2024 NEET level and the 2024-2025 decline.
+c24 <- c("R101","R404","R405","R407","R409","R610","R612","R703_A","R703_B","R705","FWT")
 r24 <- read_dta(here::here("data","Susenas 2024","ssn202403_kor_ind1.dta"), col_select = all_of(c24))
+cat("\n2024 R703_A values:", paste(names(table(as.character(r24$R703_A))), collapse=" | "), "\n")
 d24 <- tibble(prov = num(r24$R101), female = num(r24$R405) == 2, age = num(r24$R407), w = num(r24$FWT),
               married_u18 = num(r24$R404) %in% 2:4 & num(r24$R409) %in% 1:17,
-              in_school = num(r24$R610) %in% 2 | num(r24$R704) %in% 2,
-              employed = num(r24$R704) %in% 1,
+              in_school = num(r24$R610) %in% 2 | as.character(r24$R703_B) == "B",
+              working = as.character(r24$R703_A) == "A" | num(r24$R705) %in% 1,
               tertiary_now = num(r24$R610) %in% 2 & num(r24$R612) %in% 18:24) |>
-  mutate(employed = employed & !in_school, neet = !in_school & !employed)
+  mutate(employed = working & !in_school, neet = !in_school & !employed)
 rm(r24)
+
+# Employment rate of women 25-54 in East Java (the probability of earning used in the CBA;
+# LFP would include the unemployed and is not the right input)
+emp <- d25 |> filter(prov == 35, female, age >= 25, age <= 54)
+emp_rate <- weighted.mean(emp$employed | emp$working, emp$w, na.rm = TRUE)
+write_csv(tibble(measure = "Employment rate, women 25-54, East Java, SUSENAS 2025", value = round(emp_rate, 4)),
+          file.path(MOD, "female_employment_rate.csv"))
+cat(sprintf("\nEmployment rate, women 25-54, East Java 2025: %.1f%%\n", 100 * emp_rate))
 
 summ <- function(d, yr) {
   d <- d |> filter(age >= 15, age <= 24) |> mutate(unit = ifelse(prov == 35, "East Java", "Rest of Indonesia"))
@@ -194,9 +208,7 @@ chg <- EF |> select(unit, year, girls_NEET, girls_married_u18, girls_tertiary_18
 write_csv(chg, file.path(MOD, "followup_EF_changes.csv"))
 cat("\n=== E/F. East Java vs national, 2024 and 2025 (%) ===\n"); print(as.data.frame(EF))
 cat("\nChange 2024 -> 2025 (pp):\n"); print(as.data.frame(chg |> select(unit, NEET_change, married_change, tertiary_change)))
-cat("NOTE: 2025 NEET uses the multi-select activity block (R703) because the single main-activity question was dropped;\n",
-    "small definitional differences between years apply equally to East Java and the rest of Indonesia, so the\n",
-    "comparison of CHANGES between them is more robust than either year-on-year level change on its own.\n")
+cat("NOTE: both years now use the same definition (any work last week or temporarily absent; not attending school).\n")
 
 f23 <- EF |> filter(unit != "Indonesia (national)") |>
   ggplot(aes(factor(year), girls_NEET/100, colour = unit, group = unit)) +

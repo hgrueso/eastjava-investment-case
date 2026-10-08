@@ -31,6 +31,9 @@ if (file.exists(mc_path)) {
   if (length(v4)) MINC_C <- v4[1]
   if (length(v2)) MINC_H <- max(v2[1], MINC_C)
 }
+er_path <- here::here("output","models","female_employment_rate.csv")
+EMP_RATE <- if (file.exists(er_path)) read_csv(er_path, show_col_types = FALSE)$value[1] else 0.52
+message(sprintf("Female employment rate used: %.1f%%", 100*EMP_RATE))
 message(sprintf("Return to schooling used: central %.1f%%, high %.1f%%, low 5.6%%", 100*MINC_C, 100*MINC_H))
 A <- tribble(
   ~Parameter, ~Low, ~Central, ~High, ~Unit, ~Source,
@@ -42,7 +45,8 @@ A <- tribble(
     "Central: IFLS5 female wage return with urban, province fixed effects, parents' education and Heckman selection (04b, model 4). High: region controls only (model 2). Low: SUSENAS 2024 consumption return (5.6%)",
   "Female annual wage (East Java)", 15e6, 20e6, 25e6, "IDR/yr",
     "Central Rp1.67m/month: below UMP Jawa Timur 2025 (~Rp2.31m) to reflect informal work; Sakernas national female mean Rp2.61m (Feb 2025)",
-  "Female labour force participation", 0.45, 0.52, 0.60, "share", "BPS Sakernas, East Java female LFPR",
+  "Female labour force participation", 0.45, EMP_RATE, 0.65, "share",
+    "Employment rate of women 25-54 in East Java, SUSENAS Maret 2025 (14_targeting_followup.R); the probability of earning, not LFP",
   "Real earnings growth", 0.00, 0.02, 0.03, "annual", "Experience/productivity growth over the career, below real GDP per capita growth",
   "Working life", 35, 35, 35, "years", "Age ~20 to ~55",
   "Years until earnings start", 5, 5, 5, "years", "3-year programme plus transition into work",
@@ -53,8 +57,8 @@ A <- tribble(
   "School connectivity/devices (shared)", 15, 15, 15, "USD/girl/yr", "Shared labs, no 1:1 devices",
   "Ancillary: marriage-delay + flexible learning", 8, 8, 8, "USD/girl/yr", "ToR guidance: outreach to delay marriage, flexible options for caregivers",
   "Annual cost per girl (sensitivity)", 45, 58, 75, "USD/girl/yr", "Sum of components; band for cost uncertainty only",
-  "Skills earnings premium (all exposed girls who work)", 0.00, 0.056, 0.056, "share of earnings",
-    "Vocational training in Indonesia raised women's income by 5.6% (Pritadrajati 2022). Low = no premium (retention channel only)",
+  "Skills earnings premium (all exposed girls who work)", 0.00, 0.00, 0.056, "share of earnings",
+    "Central = 0 (no causal evidence for an add-on skills course). High = 5.6%, the point estimate for vocational vs general schooling in Pritadrajati (2022), not statistically significant (SE 0.076)",
   "Years the skills premium lasts", 5, 10, 20, "years", "Conservative: well short of the working life",
   "Cash+ stipend cost (optional)", 0, 0, 46, "USD/girl/yr",
     "Central: girls linked to existing PKH/PIP, no new transfer. High: PIP senior-secondary rate (~Rp1.8m/yr, verify with Kemendikbudristek) for the poorest 40% of girls",
@@ -103,10 +107,10 @@ write_csv(costing, file.path(OUT,"bcr_costing_table.csv"))
 # 4. HEADLINE: central + effect band, break-even, tornado
 # =============================================================================
 fmt <- function(x) format(round(x), big.mark = ",", scientific = FALSE)
-scen <- list("Retention channel only (floor)" = list(`Skills earnings premium (all exposed girls who work)` = 0),
-             "Central" = list(),
-             "Central, earnings at the 2025 minimum wage" = list(`Female annual wage (East Java)` = 2.31e6 * 12),
-             "Central, with Cash+ stipend for the poorest 40%" = list(`Cash+ stipend cost (optional)` = 46))
+scen <- list("Central: retention channel (Indonesian causal evidence)" = list(),
+             "Plus skills earnings premium of 5.6% (point estimate, not statistically significant)" = list(`Skills earnings premium (all exposed girls who work)` = 0.056),
+             "Retention channel, earnings at the 2025 minimum wage" = list(`Female annual wage (East Java)` = 2.31e6 * 12),
+             "Retention channel, with Cash+ stipend for the poorest 40%" = list(`Cash+ stipend cost (optional)` = 46))
 res <- bind_rows(lapply(names(scen), function(n) { x <- calc(scen[[n]])
   tibble(Scenario = n,
          `Retention benefit (USD/girl)` = fmt(x$benefit_ret),
@@ -118,20 +122,21 @@ res <- bind_rows(lapply(names(scen), function(n) { x <- calc(scen[[n]])
 write_csv(res, file.path(OUT,"bcr_scenarios_table.csv"))
 
 base <- calc()
-floor0 <- list(`Skills earnings premium (all exposed girls who work)` = 0)
+floor0 <- list()
+with_skills <- list(`Skills earnings premium (all exposed girls who work)` = 0.056)
 breakeven_pp <- 100 * base$cost / calc(c(floor0, list(`NEET reduction per exposed girl` = 1)))$benefit_ret
 write_csv(tibble(`Break-even NEET reduction (pp)` = round(breakeven_pp, 1), `Central assumed (pp)` = 5), file.path(OUT,"bcr_breakeven.csv"))
 steps <- tibble(Step = c("Extra years of schooling for a girl kept in school", "Earnings gain per year of schooling",
                          "Earnings gain for that girl", "Female earnings (USD/yr) x labour force participation",
                          "Extra earnings per year (USD)", "Present value over the working life (USD per girl moved out of NEET)",
                          "Girls exposed per girl moved out of NEET (1 / NEET reduction)", "Cost per girl moved out of NEET (USD)",
-                         "Return per USD 1, retention channel only", "Skills premium for all exposed girls who work (USD per exposed girl, PV)",
-                         "Return per USD 1, both channels"),
+                         "Return per USD 1, retention channel (central)", "Skills premium of 5.6% for all exposed girls who work, if it held (USD per exposed girl, PV)",
+                         "Return per USD 1 if the skills premium held"),
   Value = c("3", sprintf("%.1f%%", 100*get("Mincer return per year of edu")), sprintf("%.0f%%", 100*3*get("Mincer return per year of edu")),
             sprintf("%s x %.0f%%", fmt(get("Female annual wage (East Java)")/IDR_PER_USD), 100*get("Female labour force participation")),
             fmt(get("Female annual wage (East Java)")/IDR_PER_USD * get("Female labour force participation") * 3 * get("Mincer return per year of edu")),
             fmt(base$gain_per_switch), sprintf("%.0f", 1/base$neet), fmt(base$cost / base$neet),
-            sprintf("%.2f", calc(floor0)$bcr), fmt(base$benefit_prem), sprintf("%.2f", base$bcr)))
+            sprintf("%.2f", base$bcr), fmt(calc(with_skills)$benefit_prem), sprintf("%.2f", calc(with_skills)$bcr)))
 write_csv(steps, file.path(OUT,"bcr_steps.csv"))
 
 torn_params <- c("NEET reduction per exposed girl","Mincer return per year of edu",
@@ -147,8 +152,37 @@ write_csv(tornado, file.path(OUT,"bcr_tornado.csv"))
 
 cat("\n================ COSTING (single package) ================\n"); print(costing |> select(-Source))
 cat("\n================ BCR ================\n"); print(as.data.frame(res))
-cat(sprintf("\nHeadline: every USD 1 invested returns about USD %.2f (central, both channels); USD %.2f from the retention channel alone.\n", base$bcr, calc(floor0)$bcr))
+cat(sprintf("\nHeadline: every USD 1 invested returns about USD %.2f (central, retention channel); USD %.2f if the 5.6%% skills premium held.\n", base$bcr, calc(with_skills)$bcr))
 cat("\n================ HOW THE NUMBER IS BUILT ================\n"); print(as.data.frame(steps))
 cat(sprintf("Break-even (retention channel only): pays for itself at a %.1fpp NEET reduction (central assumption: 5pp).\n", breakeven_pp))
 cat("\n================ SENSITIVITY (one parameter at a time) ================\n"); print(as.data.frame(tornado |> select(-spread)))
-message("Stage 8 complete -> output/projections/bcr_*.csv")
+
+# ---- ROI figures: cost vs stacked benefit; BCR by scenario with break-even line ----
+suppressPackageStartupMessages(library(ggplot2)); source(here::here("R","utils.R"))
+if (!exists("GREY_DARK")) GREY_DARK <- "#374649"; if (!exists("GREY_MID")) GREY_MID <- "#7A8487"
+ws <- calc(with_skills)
+bars <- tibble(bar = c("Cost","Cost","Benefit","Benefit"),
+               part = c("Programme cost (3 years)","", "Earnings gain from staying in school", "Skills premium, if it held (uncertain)"),
+               usd = c(ws$cost, 0, ws$benefit_ret, ws$benefit_prem)) |> filter(usd > 0)
+f26 <- ggplot(bars, aes(x = factor(bar, c("Cost","Benefit")), y = usd, fill = part)) +
+  geom_col(width = .55) +
+  geom_text(aes(label = paste0("USD ", round(usd))), position = position_stack(vjust = .5), colour = "white", fontface = "bold", size = 4) +
+  scale_fill_manual(values = c("Programme cost (3 years)" = "#E2007A", "Earnings gain from staying in school" = "#00377C",
+                               "Skills premium, if it held (uncertain)" = "#9fc5e8"), name = NULL) +
+  labs(x = NULL, y = "USD per participating girl (present value)",
+       subtitle = "Per participating girl: cost against modelled lifetime benefits",
+       caption = "Retention benefit rests on Indonesian causal evidence; the skills premium is a point estimate that is not statistically significant") +
+  theme_minimal(base_size = 13) + theme(legend.position = "top", panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(),
+                                        plot.subtitle = element_text(colour = GREY_DARK), plot.caption = element_text(colour = GREY_MID, size = 8))
+save_fig(f26, "f26_roi_bars_en", width = 8.5, height = 5.4)
+sb <- tibble(Scenario = c("Retention channel\n(central)", "With 5.6% skills premium\n(uncertain)", "Retention, earnings at\n2025 minimum wage", "Retention, plus Cash+\nstipend for poorest 40%"),
+             BCR = c(base$bcr, ws$bcr, calc(list(`Female annual wage (East Java)` = 2.31e6*12))$bcr, calc(list(`Cash+ stipend cost (optional)` = 46))$bcr))
+f27 <- ggplot(sb, aes(x = factor(Scenario, Scenario), y = BCR)) +
+  geom_col(fill = "#00377C", width = .55) + geom_hline(yintercept = 1, linetype = "dashed", colour = "#E2007A") +
+  annotate("text", x = 4.4, y = 1.06, label = "break-even", colour = "#E2007A", size = 3.4, hjust = 1) +
+  geom_text(aes(label = sprintf("%.2f", BCR)), vjust = -0.6, size = 4, colour = GREY_DARK) +
+  scale_y_continuous(expand = expansion(mult = c(0, .2))) +
+  labs(x = NULL, y = "Benefit-cost ratio", subtitle = "Benefit-cost ratio by scenario") +
+  theme_minimal(base_size = 13) + theme(panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(), plot.subtitle = element_text(colour = GREY_DARK))
+save_fig(f27, "f27_bcr_scenarios_en", width = 8.5, height = 5)
+message("Stage 8 complete -> output/projections/bcr_*.csv, f26, f27")
