@@ -61,6 +61,8 @@ format:
         .kf-list p { margin-bottom:.7em; }
         .reveal h2 { font-size:1.25em !important; line-height:1.15 !important; }
         .vmid { margin-top:2.2em; }
+        .vmid-s { margin-top:1.2em; }
+        .vmid-l { margin-top:3.5em; }
         .reveal .assump-table table { font-size:.6em; border-collapse:collapse; width:100%; }
         .reveal .assump-table td, .reveal .assump-table th { padding:3px 8px; }
         .reveal .steps-table table { font-size:.8em; border-collapse:collapse; width:100%; }
@@ -237,6 +239,7 @@ Among 18–20 year olds who have left school, girls who completed senior seconda
 
 ## Evidence from Indonesia {.smaller}
 
+::: {.vmid-l}
 ::: {.tight-table}
 | Programme | Design | Result | Relevance |
 |---|---|---|---|
@@ -249,9 +252,11 @@ Among 18–20 year olds who have left school, girls who completed senior seconda
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
 In SUSENAS 2025, girls in PKH households have lower child-marriage rates than other girls (3% vs 4–6%), even though PKH targets poorer households. Consistent with the PKH evidence, though not a causal estimate.
 :::
+:::
 
 ## Theory of change
 
+::: {.vmid-l}
 ```{mermaid}
 %%| fig-width: 13
 flowchart LR
@@ -278,14 +283,21 @@ flowchart LR
   classDef r fill:#e8f5e9,stroke:#2e7d32,color:#1b5e20
 ```
 
-::: {style="font-size:0.58em; color:#7a7a7a;"}
-Each arrow rests on evidence from Indonesia: cash transfers reduce girls' child marriage (PKH); education assistance raises school participation (PIP, pooled) and girls' senior-secondary enrolment (PIP, adjusted association); completion is associated with 20 points lower NEET for girls (this analysis). The link from skills to earnings is the weakest: the Indonesian estimate is not statistically significant. Mentoring and outreach have only international evidence for girls. The cash component links girls to existing PKH and PIP rather than creating a new transfer.
+::: {style="font-size:0.55em; color:#5a6b73; line-height:1.4;"}
+- Cash transfers reduce girls' child marriage (PKH, Indonesia).
+- Education assistance raises school participation and girls' senior-secondary enrolment (PIP, Indonesia).
+- Completing senior secondary is associated with 20 points lower NEET for girls (this analysis).
+- Skills to earnings is the weakest link: the Indonesian estimate is not statistically significant.
+- Mentoring and outreach: international evidence for girls only.
+- Cash+ links girls to existing PKH and PIP; no new transfer.
+:::
 :::
 
 # 3 · Return on investment {.section-divider background-color="#00377C"}
 
 ## Key assumptions {.smaller}
 
+::: {.vmid}
 ::: {.assump-table}
 | Assumption | Value | Source |
 |---|---|---|
@@ -297,6 +309,7 @@ Each arrow rests on evidence from Indonesia: cash transfers reduce girls' child 
 | Earnings growth / discount rate | 2% / 3% per year | Career growth; 3% real, with 2% and 5% in sensitivity |
 | Skills earnings premium (scenario only, not in the central case) | 5.6% for 10 years | Point estimate for vocational vs general schooling (Pritadrajati 2022), not statistically significant |
 | Programme cost | USD 200 per girl | USD 58 per year for 3 years, plus 15% overhead; Cash+ links to existing PKH/PIP |
+:::
 :::
 
 ## How the return is built {.smaller}
@@ -312,6 +325,7 @@ if (!is.null(st)) knitr::kable(st, align = "lr")
 
 ## Every USD 1 invested could return up to USD `r BCR_SK` in lifetime earnings {.smaller}
 
+::: {.vmid-s}
 ::: {.columns}
 ::: {.column width="44%"}
 ```{r f26, results='asis'}
@@ -325,6 +339,7 @@ FIG("f26_roi_bars_en.png", "100%")
 - **Skills channel on its own: USD `r SK_ONLY` per USD 1.** USD `r SK_B` per girl if the 5.6% earnings premium for vocational schooling in Indonesia applies; that estimate is not statistically significant, so this is the less conservative part.
 - **Not counted in either:** delayed marriage, health, children's outcomes and fiscal returns. These are benefit-cost ratios, not fiscal returns to government.
 - **The USD `r COST` per girl** covers three years of digital content, teacher training, mentoring, shared connectivity and marriage-delay outreach, plus 15% overhead; PKH and PIP transfers are existing entitlements.
+:::
 :::
 :::
 :::
@@ -349,6 +364,7 @@ The central case is the retention channel; the second row adds the uncertain ski
 
 ## Key messages {.smaller .bigtitle}
 
+::: {.vmid-l}
 ::: {.kf-list style="font-size:.92em;"}
 **1.** Girls in East Java have the same school attendance rate as boys but are close to twice as likely to be NEET, a wider gap than nationally, costing about USD `r LOSS_BN` billion in forgone lifetime productivity.
 
@@ -356,9 +372,11 @@ The central case is the retention channel; the second row adds the uncertain ski
 
 **3.** A USD `r COST`-per-girl package returns at least USD `r BCR_C` per USD 1 from keeping girls in school, and up to USD `r BCR_SK` if the skills component raises earnings, before counting delayed marriage or health benefits.
 :::
+:::
 
 ## Policy recommendations {.smaller .bigtitle}
 
+::: {.vmid}
 ::: {.kf-list style="font-size:.84em;"}
 **1. Target the transition, not enrolment.** Girls attend school at the same rate as boys, and senior-secondary enrolment rose faster in East Java than elsewhere in 2024–2025, but tertiary enrolment rose more slowly. Set targets on completion and the first job or further study.
 
@@ -369,6 +387,7 @@ The central case is the retention channel; the second row adds the uncertain ski
 **4. Fund pedagogy and mentoring, not devices.** Internet use is already near universal, and devices alone did not raise learning in Uruguay.
 
 **5. Measure the programme's own effect.** Survey trends cannot separate the programme from wider changes. Compare programme and non-programme districts, and track whether girls move into wage employment rather than unpaid family work.
+:::
 :::
 
 # Appendix {.section-divider background-color="#00377C"}
