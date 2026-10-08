@@ -103,6 +103,12 @@ MINCER_C <- if (!is.null(.mc)) { v <- .mc$`Return per year`[.mc$Sex == "Women" &
 .tn <- .rdc("projections/bcr_tornado.csv")
 if (!is.null(.tn)) { .o <- .tn[!grepl("NEET|premium", .tn$Parameter), ]; .v <- as.numeric(c(.o$`BCR at low value`, .o$`BCR at high value`))
   RANGE_LO <- sprintf("%.2f", min(.v)); RANGE_HI <- sprintf("%.2f", max(.v)) } else { RANGE_LO <- "0.71"; RANGE_HI <- "1.57" }
+.ef <- .rdc("models/followup_EF_changes.csv")
+.chg <- function(u, col) { if (is.null(.ef)) return("n/a"); x <- as.numeric(.ef[[col]][.ef$unit == u])
+  sprintf("%s %.1f points", ifelse(x < 0, "fell", "rose"), abs(x)) }
+.en <- .rdc("models/followup2_B_secondary_enrolment.csv")
+.enc <- function(u, s) { if (is.null(.en)) return(NA); r <- .en[.en$unit == u & .en$sex == s, ]
+  as.numeric(r$rate[r$year == "2025"]) - as.numeric(r$rate[r$year == "2024"]) }
 TAB <- file.path("..", "output", "tables", "t8_target_funnel.csv")
 ```
 
@@ -185,23 +191,24 @@ FIG("f21_employment_type_en.png", "72%")
 Among employed girls married before 18, 35% are wage employees (others 75%) and 31% are unpaid family workers (others 12%); 22% work under 20 hours a week (others 12%). Based on 78 employed married girls, so indicative. SUSENAS has no earnings; the appendix shows earnings by type of work for young women from IFLS5.
 :::
 
-## Girls' NEET fell from 2024 to 2025, slightly more than in the rest of Indonesia {.smaller}
+## Girls' NEET in East Java and the rest of Indonesia, 2024 and 2025 {.smaller}
 ```{r f23, results='asis'}
 FIG("f23_trend_ej_vs_national_en.png", "70%")
 ```
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
-Girls' NEET fell 5.6 points in East Java and 4.5 in the rest of Indonesia; child marriage fell 1.3 and 0.7 points. Tertiary enrolment at 18–20 rose 3.2 points, less than elsewhere (5.0). Both years use the same definition (any work in the last week, or temporarily absent from a job; not attending school). Most of the decline is national, so it cannot be attributed to a programme. A district-level comparison with programme districts is pending.
+Girls' NEET (15–24) `r .chg("East Java","NEET_change")` in East Java and `r .chg("Rest of Indonesia","NEET_change")` in the rest of Indonesia; child marriage `r .chg("East Java","married_change")` and `r .chg("Rest of Indonesia","married_change")`; tertiary enrolment at 18–20 `r .chg("East Java","tertiary_change")` and `r .chg("Rest of Indonesia","tertiary_change")`. Both years use the same definition (any work in the last week, or temporarily absent from a job; not attending school). Survey trends cannot separate a programme from wider changes; a comparison of programme and non-programme districts is pending.
 :::
 
-## Senior-secondary enrolment also rose, in East Java and nationally {.smaller}
+## Senior-secondary enrolment rose faster in East Java than in the rest of Indonesia {.smaller}
 ```{r f25, results='asis'}
 FIG("f25_secondary_enrolment_trend_en.png", "70%")
 ```
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
-Girls 16–18 enrolled in senior secondary, 2024 and 2025. A rise shared with the rest of Indonesia points to national drivers (such as PIP) rather than something specific to East Java.
+Share of 16–18 year olds enrolled in senior secondary rose `r sprintf("%.1f", .enc("East Java","Girls"))` points for girls in East Java against `r sprintf("%.1f", .enc("Rest of Indonesia","Girls"))` in the rest of Indonesia (boys: `r sprintf("%.1f", .enc("East Java","Boys"))` against `r sprintf("%.1f", .enc("Rest of Indonesia","Boys"))`). The faster rise applies to both sexes, so it points to something affecting East Java's schools generally rather than a girls-specific programme. The district comparison can test whether programme districts drove it.
 :::
+
 
 # 2 · Theory of change {.section-divider background-color="#00377C"}
 
@@ -340,7 +347,7 @@ The central case is the retention channel; the second row adds the uncertain ski
 
 **4. Fund pedagogy and mentoring, not devices.** Internet use is already near universal, and devices alone did not raise learning in Uruguay.
 
-**5. Measure the programme's own effect.** The 2024-2025 fall in girls' NEET is national, not provincial. Compare programme and non-programme districts, and track whether girls move into wage employment rather than unpaid family work.
+**5. Measure the programme's own effect.** Survey trends cannot separate the programme from wider changes. Compare programme and non-programme districts, and track whether girls move into wage employment rather than unpaid family work.
 :::
 
 # Appendix {.section-divider background-color="#00377C"}

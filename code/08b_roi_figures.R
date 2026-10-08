@@ -2,7 +2,10 @@
 #  f26: cost vs stacked benefit per participating girl
 #  f27: benefit-cost ratio by scenario, with the break-even line
 suppressPackageStartupMessages({ library(dplyr); library(ggplot2); library(readr); library(here) })
-source(here::here("R","utils.R"))
+source(here::here("R","utils.R")); source(here::here("R","theme.R"))
+if (!exists("save_fig")) save_fig <- function(p, name, width = 8, height = 5, dpi = 220) {
+  ggsave(here::here("output","figures", paste0(name, ".png")), p, width = width, height = height, dpi = dpi, bg = "white")
+  message("  saved figure: ", name, ".png") }
 GREY_DARK <- "#374649"; GREY_MID <- "#7A8487"
 sc <- read_csv(here::here("output","projections","bcr_scenarios_table.csv"), col_types = cols(.default = "c"))
 n <- function(x) parse_number(x)

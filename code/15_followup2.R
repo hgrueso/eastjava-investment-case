@@ -106,7 +106,7 @@ B <- read_csv(file.path(MOD, "followup_B_employment_type.csv"), show_col_types =
 med <- setNames(C$`Median monthly earnings (IDR)`, C$Type)
 lab <- function(t) { m <- med[t]
   if (t == "Unpaid family worker") return(paste0(t, ": no earnings"))
-  if (is.na(m)) return(t); paste0(t, ": Rp", formatC(m/1e6, format = "f", digits = 2), "m/month") }
+  if (is.na(m)) return(t); paste0(t, ": Rp", formatC(m, format = "d", big.mark = ","), " a month") }
 types <- c("Employee (wage)","Own business","Casual worker","Unpaid family worker")
 labs_t <- setNames(sapply(types, lab), types)
 f21 <- ggplot(B, aes(group, share, fill = type)) +
@@ -116,10 +116,11 @@ f21 <- ggplot(B, aes(group, share, fill = type)) +
   scale_fill_manual(values = c("Employee (wage)" = UNICEF_DARK, "Own business" = "#1CABE2",
                                "Casual worker" = "#7a5b00", "Unpaid family worker" = ACCENT_GIRL),
                     labels = labs_t, breaks = types, name = NULL) +
-  guides(fill = guide_legend(nrow = 2)) +
+  guides(fill = guide_legend(nrow = 2, byrow = TRUE)) +
   labs(x = NULL, y = "% of employed girls",
        subtitle = "Type of work among employed girls 15-24, by child-marriage status",
        caption = "SUSENAS Maret 2025, East Java, survey-weighted. Legend: median monthly earnings of women 15-30 by type of work, IFLS5 (2014/15 prices).") +
-  theme_ej
-save_fig(f21, "f21_employment_type_en", width = 8.5, height = 5.6)
+  theme_ej + theme(legend.text = element_text(size = 11, margin = margin(r = 28)),
+                   legend.key.size = unit(14, "pt"), legend.margin = margin(b = 6))
+save_fig(f21, "f21_employment_type_en", width = 9.5, height = 5.8)
 message("15 done")
