@@ -53,6 +53,11 @@ A <- tribble(
   "School connectivity/devices (shared)", 15, 15, 15, "USD/girl/yr", "Shared labs, no 1:1 devices",
   "Ancillary: marriage-delay + flexible learning", 8, 8, 8, "USD/girl/yr", "ToR guidance: outreach to delay marriage, flexible options for caregivers",
   "Annual cost per girl (sensitivity)", 45, 58, 75, "USD/girl/yr", "Sum of components; band for cost uncertainty only",
+  "Skills earnings premium (all exposed girls who work)", 0.00, 0.056, 0.056, "share of earnings",
+    "Vocational training in Indonesia raised women's income by 5.6% (Pritadrajati 2022). Low = no premium (retention channel only)",
+  "Years the skills premium lasts", 5, 10, 20, "years", "Conservative: well short of the working life",
+  "Cash+ stipend cost (optional)", 0, 0, 46, "USD/girl/yr",
+    "Central: girls linked to existing PKH/PIP, no new transfer. High: PIP senior-secondary rate (~Rp1.8m/yr, verify with Kemendikbudristek) for the poorest 40% of girls",
   "Programme overhead", 0.15, 0.15, 0.15, "share of direct", "UNICEF typical 10-20%",
   "Years of programme exposure", 3, 3, 3, "years", "Senior-secondary cycle"
 )
@@ -70,10 +75,15 @@ calc <- function(over = list()) {
   t <- d:(d + T - 1)
   per_year <- w * p("Female labour force participation") * p("Mincer return per year of edu") *
               p("NEET reduction per exposed girl") * p("Extra years schooling if retained")
-  benefit <- sum(per_year * (1 + g)^(t - d) / (1 + r)^t)
-  cost <- p("Annual cost per girl (sensitivity)") * p("Years of programme exposure") * (1 + p("Programme overhead"))
-  list(benefit = benefit, cost = cost, bcr = benefit / cost,
-       neet = p("NEET reduction per exposed girl"))
+  benefit_ret <- sum(per_year * (1 + g)^(t - d) / (1 + r)^t)          # channel 1: retention -> NEET
+  tp <- d:(d + p("Years the skills premium lasts") - 1)
+  benefit_prem <- sum(w * p("Female labour force participation") * p("Skills earnings premium (all exposed girls who work)") *
+                      (1 + g)^(tp - d) / (1 + r)^tp)                    # channel 2: skills premium, all who work
+  cost <- (p("Annual cost per girl (sensitivity)") + p("Cash+ stipend cost (optional)")) *
+          p("Years of programme exposure") * (1 + p("Programme overhead"))
+  list(benefit = benefit_ret + benefit_prem, benefit_ret = benefit_ret, benefit_prem = benefit_prem,
+       cost = cost, bcr = (benefit_ret + benefit_prem) / cost, neet = p("NEET reduction per exposed girl"),
+       gain_per_switch = benefit_ret / p("NEET reduction per exposed girl"))
 }
 
 # =============================================================================
@@ -93,26 +103,41 @@ write_csv(costing, file.path(OUT,"bcr_costing_table.csv"))
 # 4. HEADLINE: central + effect band, break-even, tornado
 # =============================================================================
 fmt <- function(x) format(round(x), big.mark = ",", scientific = FALSE)
-scen <- list("Lower effect (2.5pp)" = list(`NEET reduction per exposed girl` = 0.025),
-             "Central (5pp)" = list(),
-             "Higher effect (7.5pp)" = list(`NEET reduction per exposed girl` = 0.075))
+scen <- list("Retention channel only (floor)" = list(`Skills earnings premium (all exposed girls who work)` = 0),
+             "Central" = list(),
+             "Central, earnings at the 2025 minimum wage" = list(`Female annual wage (East Java)` = 2.31e6 * 12),
+             "Central, with Cash+ stipend for the poorest 40%" = list(`Cash+ stipend cost (optional)` = 46))
 res <- bind_rows(lapply(names(scen), function(n) { x <- calc(scen[[n]])
   tibble(Scenario = n,
-         `NEET cases averted per 1,000 girls` = round(1000 * x$neet),
-         `Benefit PV (USD/girl)` = fmt(x$benefit),
+         `Retention benefit (USD/girl)` = fmt(x$benefit_ret),
+         `Skills premium benefit (USD/girl)` = fmt(x$benefit_prem),
+         `Total benefit (USD/girl)` = fmt(x$benefit),
          `Cost (USD/girl)` = fmt(x$cost),
          BCR = sprintf("%.2f", x$bcr),
          `Cost per NEET case averted (USD)` = fmt(x$cost / x$neet)) }))
 write_csv(res, file.path(OUT,"bcr_scenarios_table.csv"))
 
 base <- calc()
-breakeven_pp <- 100 * base$cost / calc(list(`NEET reduction per exposed girl` = 1))$benefit
-write_csv(tibble(`Break-even NEET reduction (pp)` = round(breakeven_pp, 1),
-                 `Central assumed (pp)` = 5), file.path(OUT,"bcr_breakeven.csv"))
+floor0 <- list(`Skills earnings premium (all exposed girls who work)` = 0)
+breakeven_pp <- 100 * base$cost / calc(c(floor0, list(`NEET reduction per exposed girl` = 1)))$benefit_ret
+write_csv(tibble(`Break-even NEET reduction (pp)` = round(breakeven_pp, 1), `Central assumed (pp)` = 5), file.path(OUT,"bcr_breakeven.csv"))
+steps <- tibble(Step = c("Extra years of schooling for a girl kept in school", "Earnings gain per year of schooling",
+                         "Earnings gain for that girl", "Female earnings (USD/yr) x labour force participation",
+                         "Extra earnings per year (USD)", "Present value over the working life (USD per girl moved out of NEET)",
+                         "Girls exposed per girl moved out of NEET (1 / NEET reduction)", "Cost per girl moved out of NEET (USD)",
+                         "Return per USD 1, retention channel only", "Skills premium for all exposed girls who work (USD per exposed girl, PV)",
+                         "Return per USD 1, both channels"),
+  Value = c("3", sprintf("%.1f%%", 100*get("Mincer return per year of edu")), sprintf("%.0f%%", 100*3*get("Mincer return per year of edu")),
+            sprintf("%s x %.0f%%", fmt(get("Female annual wage (East Java)")/IDR_PER_USD), 100*get("Female labour force participation")),
+            fmt(get("Female annual wage (East Java)")/IDR_PER_USD * get("Female labour force participation") * 3 * get("Mincer return per year of edu")),
+            fmt(base$gain_per_switch), sprintf("%.0f", 1/base$neet), fmt(base$cost / base$neet),
+            sprintf("%.2f", calc(floor0)$bcr), fmt(base$benefit_prem), sprintf("%.2f", base$bcr)))
+write_csv(steps, file.path(OUT,"bcr_steps.csv"))
 
 torn_params <- c("NEET reduction per exposed girl","Mincer return per year of edu",
                  "Female annual wage (East Java)","Female labour force participation",
-                 "Real earnings growth","Discount rate","Annual cost per girl (sensitivity)")
+                 "Real earnings growth","Discount rate","Annual cost per girl (sensitivity)",
+                 "Skills earnings premium (all exposed girls who work)","Years the skills premium lasts")
 tornado <- bind_rows(lapply(torn_params, function(p) {
   lo <- calc(setNames(list(get(p,"Low")),  p))$bcr
   hi <- calc(setNames(list(get(p,"High")), p))$bcr
@@ -122,7 +147,8 @@ write_csv(tornado, file.path(OUT,"bcr_tornado.csv"))
 
 cat("\n================ COSTING (single package) ================\n"); print(costing |> select(-Source))
 cat("\n================ BCR ================\n"); print(as.data.frame(res))
-cat(sprintf("\nHeadline: every USD 1 invested returns about USD %.2f in lifetime earnings (central).\n", base$bcr))
-cat(sprintf("Break-even: the programme pays for itself if it reduces girls' NEET by %.1fpp (central assumption: 5pp).\n", breakeven_pp))
+cat(sprintf("\nHeadline: every USD 1 invested returns about USD %.2f (central, both channels); USD %.2f from the retention channel alone.\n", base$bcr, calc(floor0)$bcr))
+cat("\n================ HOW THE NUMBER IS BUILT ================\n"); print(as.data.frame(steps))
+cat(sprintf("Break-even (retention channel only): pays for itself at a %.1fpp NEET reduction (central assumption: 5pp).\n", breakeven_pp))
 cat("\n================ SENSITIVITY (one parameter at a time) ================\n"); print(as.data.frame(tornado |> select(-spread)))
 message("Stage 8 complete -> output/projections/bcr_*.csv")
