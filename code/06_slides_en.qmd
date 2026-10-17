@@ -11,6 +11,7 @@ format:
     transition: fade
     embed-resources: true
     fig-align: center
+    pdf-max-pages-per-slide: 1
     include-in-header:
       text: |
         <style>
@@ -165,7 +166,7 @@ The deck moves from the problem, to how the proposed programme is expected to wo
 
 [Observed: SUSENAS 2025]{.tag .tag-obs}
 ```{r f1a, results='asis'}
-FIG("f1a_outcomes_by_sex_en.png", "78%")
+FIG("f1a_outcomes_by_sex_en.png", "70%")
 ```
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
@@ -319,12 +320,12 @@ if (!is.null(dc)) knitr::kable(dc, align = "lrrrr")
 :::
 
 ::: {style="font-size:0.56em; color:#7a7a7a;"}
-Girls 15–24, same definitions in both years. Reading the table against the explanations raised: the national internship programme would show up as a fall concentrated among 22–24 year olds with a tertiary certificate; growth in informal and gig work as a rising share in own business or in trade and transport; schooling policies as a rising share in school.
+Girls 15–24, same definitions in both years. The fall came mainly from more girls working (+2.8 points), not more girls in school (+0.4). NEET rose slightly among 22–24 year olds with a tertiary certificate, so the national internship programme explains little of the change in East Java. The share of working girls in trade or transport rose 4.5 points, against no change elsewhere, consistent with growth in informal and platform-based work.
 :::
 
 
 ::: {.notes}
-This table tests the explanations raised by the team for the fall in NEET: the national internship programme, more informal and gig work, and policies to widen access to secondary school. Each would leave a different trace in the data, described under the table.
+This table tests the explanations raised by the team for the fall in NEET. The fall came mostly from more girls working, especially in trade and transport, rather than from more girls in school. NEET did not fall among young women with a university degree, so the national internship programme is unlikely to be the main driver in East Java.
 :::
 
 ## Programme districts compared with the rest of East Java {.smaller}
@@ -335,12 +336,12 @@ FIG("f29_programme_districts_en.png", "84%")
 ```
 
 ::: {style="font-size:0.56em; color:#7a7a7a;"}
-Twelve programme districts pooled, against the other 26. Difference in the change in girls' NEET: `r PROG_DID` points (p = `r PROG_P`). Programme districts were selected rather than assigned at random, and if the programme started before March 2024 part of its effect is already in the baseline, so this is a descriptive comparison, not an impact estimate.
+Twelve programme districts pooled, against the other 26. Every indicator improved more in programme districts, but none of the differences is statistically significant (girls' NEET: `r PROG_DID` points, p = `r PROG_P`). Programme districts were selected rather than assigned at random, and if the programme started before March 2024 part of its effect is already in the baseline, so this is a descriptive comparison, not an impact estimate.
 :::
 
 
 ::: {.notes}
-This compares the districts where the programme works with the rest of East Java, before and after. A larger improvement in programme districts would be consistent with a programme effect but would not prove it, because programme districts were selected, not chosen at random, and we only have two years of data.
+This compares the districts where the programme works with the rest of East Java, before and after. Programme districts improved more than the rest on every indicator, which is encouraging, but the differences are small enough that they could be chance. Programme districts were also selected rather than chosen at random, and we only have two years of data, so this is not yet evidence of impact.
 :::
 
 # 2 · Theory of change {.section-divider background-color="#00377C"}
@@ -542,13 +543,14 @@ FIG("f28_bcr_montecarlo_en.png", "100%")
 - **Staying in school only:** pays for itself in `r .mcv(1, 'Probability BCR > 1', TRUE)` of simulations; median return USD `r .mcv(1, 'Median')` per USD 1 (90% of results between `r .mcv(1, 'Lower (5th pct)')` and `r .mcv(1, 'Upper (95th pct)')`).
 - **Both channels:** pays for itself in `r .mcv(2, 'Probability BCR > 1', TRUE)` of simulations; median USD `r .mcv(2, 'Median')` (between `r .mcv(2, 'Lower (5th pct)')` and `r .mcv(2, 'Upper (95th pct)')`).
 - **What varies:** the PIP effect (±50%); the pass-through, return to schooling and skills premium with their estimated standard errors; earnings, employment, discount rate and cost over their ranges.
+- The median is below the central estimate (USD `r BCR_C`) because several ranges extend further on the downside, such as a discount rate up to 5% and employment down to 45%.
 :::
 :::
 :::
 
 
 ::: {.notes}
-Here all uncertain inputs vary at the same time across 5,000 simulations. The chart shows the range of possible returns and how often the programme pays for itself.
+Here all uncertain inputs vary at the same time across 5,000 simulations. On schooling alone, the programme pays for itself in about four out of five simulations. Adding the uncertain skills effect raises the typical return but also widens the range.
 :::
 
 # 4 · Key messages {.section-divider background-color="#00377C"}
@@ -582,7 +584,7 @@ Three messages: the gap is at the transition out of school and is costly; comple
 
 **4. Fund pedagogy and mentoring, not devices.** Internet use is already near universal, and devices alone did not raise learning in Uruguay.
 
-**5. Measure the programme's own effect.** Survey trends cannot separate the programme from wider changes. Compare programme and non-programme districts, and track whether girls move into wage employment rather than unpaid family work.
+**5. Measure the programme's own effect.** Programme districts improved more than the rest between 2024 and 2025 on every indicator, but not by enough to rule out chance. Build in a proper comparison from the start, and track whether girls move into wage employment rather than unpaid family work.
 :::
 :::
 

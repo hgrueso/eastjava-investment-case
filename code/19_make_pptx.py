@@ -1,7 +1,8 @@
 # 19_make_pptx.py: PowerPoint version of the deck for comments.
 # Each PDF page becomes a full-slide image (layout identical to the PDF), and
 # the speaker notes written in the .qmd are copied into each slide's notes field.
-import re, html, fitz
+import re, html
+import pymupdf as fitz
 from pptx import Presentation
 from pptx.util import Emu
 
