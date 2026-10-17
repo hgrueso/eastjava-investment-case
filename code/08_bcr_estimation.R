@@ -23,22 +23,28 @@ IDR_PER_USD <- 15800   # ~2024 average; adjust as needed
 # =============================================================================
 # Return to schooling read from 04b: central = women, model (4) region + parents'
 # education + selection; high = women, model (2) region only; low = SUSENAS consumption.
-MINC_C <- 0.096; MINC_H <- 0.122
+MINC_C <- 0.096; MINC_H <- 0.122; MINC_SE <- 0.012
 mc_path <- here::here("output","models","mincer_ifls_controls.csv")
 if (file.exists(mc_path)) {
   mc <- read_csv(mc_path, show_col_types = FALSE) |> filter(Sex == "Women")
   v4 <- mc$`Return per year`[grepl("^\\(4\\)", mc$Model)]; v2 <- mc$`Return per year`[grepl("^\\(2\\)", mc$Model)]
-  if (length(v4)) MINC_C <- v4[1]
+  if (length(v4)) { MINC_C <- v4[1]; MINC_SE <- mc$SE[grepl("^\\(4\\)", mc$Model)][1] }
   if (length(v2)) MINC_H <- max(v2[1], MINC_C)
 }
 er_path <- here::here("output","models","female_employment_rate.csv")
 EMP_RATE <- if (file.exists(er_path)) read_csv(er_path, show_col_types = FALSE)$value[1] else 0.52
 message(sprintf("Female employment rate used: %.1f%%", 100*EMP_RATE))
+pt_path <- here::here("output","models","pass_through.csv")
+PIP_EFFECT <- 0.114   # Ulfa & Rezki (2024), Table 4: PIP raises school participation by 11.4pp
+PASS <- 0.45; PASS_SE <- 0.05
+if (file.exists(pt_path)) { pt <- read_csv(pt_path, show_col_types = FALSE); PASS <- pt$value[1]; PASS_SE <- pt$se[1] }
+NEET_C <- PIP_EFFECT * PASS
+message(sprintf("Pass-through used: %.1f%% (SE %.1f) -> NEET reduction %.1fpp", 100*PASS, 100*PASS_SE, 100*NEET_C))
 message(sprintf("Return to schooling used: central %.1f%%, high %.1f%%, low 5.6%%", 100*MINC_C, 100*MINC_H))
 A <- tribble(
   ~Parameter, ~Low, ~Central, ~High, ~Unit, ~Source,
-  "NEET reduction per exposed girl", 0.025, 0.050, 0.075, "share (pp/100)",
-    "Central: PIP attendance +11.4pp (Ulfa & Rezki 2024) x 0.45 pass-through to NEET. Band = 0.5x to 1.5x central.",
+  "NEET reduction per exposed girl", 0.5*NEET_C, NEET_C, 1.5*NEET_C, "share (pp/100)",
+    "PIP school-participation effect of 11.4pp (Ulfa & Rezki 2024) x share of girls who leave school without completing senior secondary who are NEET (SUSENAS 2025, 17_followup3.R). Band = 0.5x to 1.5x",
   "Extra years schooling if retained", 3, 3, 3, "years",
     "Full senior-secondary cycle (fixed by programme design)",
   "Mincer return per year of edu", 0.056, MINC_C, MINC_H, "share of earnings",
@@ -149,6 +155,34 @@ tornado <- bind_rows(lapply(torn_params, function(p) {
   tibble(Parameter = p, `BCR at low value` = round(lo,2), `BCR at high value` = round(hi,2),
          spread = abs(hi - lo)) })) |> arrange(desc(spread))
 write_csv(tornado, file.path(OUT,"bcr_tornado.csv"))
+
+# ---- Probabilistic sensitivity: all uncertain inputs drawn together --------
+# Estimated inputs use their standard errors (return to schooling, pass-through,
+# skills premium); assumed inputs use triangular distributions over the ranges above.
+set.seed(2026); N_SIM <- 5000
+rtri <- function(n, a, c, b) { u <- runif(n); f <- (c - a) / (b - a)
+  ifelse(u < f, a + sqrt(u * (b - a) * (c - a)), b - sqrt((1 - u) * (b - a) * (b - c))) }
+tri <- function(p) { v <- c(get(p, "Low"), get(p, "Central"), get(p, "High")); rtri(N_SIM, min(v), get(p, "Central"), max(v)) }
+dr <- tibble(
+  att   = rtri(N_SIM, 0.5 * PIP_EFFECT, PIP_EFFECT, 1.5 * PIP_EFFECT),
+  pass  = pmin(pmax(rnorm(N_SIM, PASS, PASS_SE), 0), 1),
+  minc  = rnorm(N_SIM, MINC_C, MINC_SE),
+  prem  = rnorm(N_SIM, 0.056, 0.076),   # Pritadrajati (2022): coefficient 0.056, SE 0.076
+  wage  = tri("Female annual wage (East Java)"), lfp = tri("Female labour force participation"),
+  grow  = tri("Real earnings growth"), disc = tri("Discount rate"), cost = tri("Annual cost per girl (sensitivity)"))
+sim <- bind_rows(lapply(seq_len(N_SIM), function(i) { x <- dr[i, ]
+  base_o <- list(`NEET reduction per exposed girl` = x$att * x$pass, `Mincer return per year of edu` = x$minc,
+                 `Female annual wage (East Java)` = x$wage, `Female labour force participation` = x$lfp,
+                 `Real earnings growth` = x$grow, `Discount rate` = x$disc, `Annual cost per girl (sensitivity)` = x$cost)
+  tibble(sim = i, retention = calc(c(base_o, list(`Skills earnings premium (all exposed girls who work)` = 0)))$bcr,
+         with_skills = calc(c(base_o, list(`Skills earnings premium (all exposed girls who work)` = x$prem)))$bcr) }))
+write_csv(sim, file.path(OUT, "bcr_mc_draws.csv"))
+mc_sum <- bind_rows(lapply(c("retention","with_skills"), function(v) tibble(
+  Case = ifelse(v == "retention", "Staying in school only", "Both channels"),
+  Median = round(median(sim[[v]]), 2), `Lower (5th pct)` = round(quantile(sim[[v]], .05), 2),
+  `Upper (95th pct)` = round(quantile(sim[[v]], .95), 2), `Probability BCR > 1` = round(mean(sim[[v]] > 1), 3))))
+write_csv(mc_sum, file.path(OUT, "bcr_montecarlo.csv"))
+cat("\n================ PROBABILISTIC SENSITIVITY (", N_SIM, " draws) ================\n", sep = ""); print(as.data.frame(mc_sum))
 
 cat("\n================ COSTING (single package) ================\n"); print(costing |> select(-Source))
 cat("\n================ BCR ================\n"); print(as.data.frame(res))

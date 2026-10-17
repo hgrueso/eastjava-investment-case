@@ -38,4 +38,17 @@ f27 <- ggplot(sb, aes(Scenario, BCR)) +
   theme_minimal(base_size = 12) +
   theme(panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(), plot.caption = element_text(colour = GREY_MID))
 save_fig(f27, "f27_bcr_scenarios_en", width = 9, height = 4.8)
-message("08b done -> f26, f27")
+mc <- read_csv(here::here("output","projections","bcr_mc_draws.csv"), show_col_types = FALSE) |>
+  tidyr::pivot_longer(c(retention, with_skills), names_to = "case", values_to = "BCR") |>
+  mutate(case = ifelse(case == "retention", "Staying in school only", "Both channels"))
+f28 <- ggplot(mc, aes(BCR, fill = case)) +
+  geom_density(alpha = .55, colour = NA) +
+  geom_vline(xintercept = 1, linetype = "dashed", colour = "#E2007A") +
+  annotate("text", x = 1, y = Inf, label = " break-even", hjust = 0, vjust = 1.5, colour = "#E2007A", size = 3.6) +
+  scale_fill_manual(values = c("Staying in school only" = "#00377C", "Both channels" = "#7fb3e0"), name = NULL) +
+  coord_cartesian(xlim = c(0, quantile(mc$BCR, .99))) +
+  labs(x = "Benefit-cost ratio", y = NULL, caption = "5,000 simulations with all uncertain inputs varying together") +
+  theme_minimal(base_size = 13) + theme(legend.position = "top", axis.text.y = element_blank(), panel.grid.minor = element_blank(),
+                                        plot.caption = element_text(colour = GREY_MID))
+save_fig(f28, "f28_bcr_montecarlo_en", width = 8, height = 4.8)
+message("08b done -> f26, f27, f28")
