@@ -62,31 +62,36 @@ A <- bind_rows(lapply(names(outcomes), function(nm) {
   o <- outcomes[[nm]]; dd <- ej |> filter(age >= o$a[1], age <= o$a[2]) |> mutate(yv = as.numeric(.data[[o$v]]))
   des <- svydesign(ids = ~psu, strata = ~strata, weights = ~w, data = dd, nest = TRUE)
   fit <- svyglm(yv ~ prog * y25, des); co <- summary(fit)$coefficients["prog:y25", ]
+  ch <- sapply(c("Programme districts", "Other districts"), function(gg)
+    summary(svyglm(yv ~ y25, subset(des, group == gg)))$coefficients["y25", 1:2])
   lv <- dd |> group_by(group, year) |> summarise(r = 100 * weighted.mean(yv, w), n = n(), .groups = "drop") |>
     pivot_wider(names_from = year, values_from = c(r, n))
   tibble(Outcome = nm,
          `Programme 2024` = round(lv$r_2024[lv$group == "Programme districts"], 1), `Programme 2025` = round(lv$r_2025[lv$group == "Programme districts"], 1),
          `Other 2024` = round(lv$r_2024[lv$group == "Other districts"], 1), `Other 2025` = round(lv$r_2025[lv$group == "Other districts"], 1),
-         `Difference in change (pp)` = round(100 * co[1], 1), SE = round(100 * co[2], 1), p = round(co[4], 3),
+         `Difference in change (pp)` = round(100 * co[1], 1), SE = round(100 * co[2], 1),
+         `95% CI` = sprintf("%.1f to %.1f", 100 * (co[1] - 1.96 * co[2]), 100 * (co[1] + 1.96 * co[2])), p = round(co[4], 3),
+         `Programme change SE` = round(100 * ch[2, 1], 2), `Other change SE` = round(100 * ch[2, 2], 2),
          `N girls, programme (2025)` = lv$n_2025[lv$group == "Programme districts"])
 }))
 A <- A |> mutate(`Programme change` = `Programme 2025` - `Programme 2024`, `Other change` = `Other 2025` - `Other 2024`)
 write_csv(A, file.path(MOD, "followup3_A_programme_districts.csv"))
 cat("\n=== A. Programme vs other districts, girls, East Java ===\n"); print(as.data.frame(A))
 
-fa <- A |> select(Outcome, `Programme change`, `Other change`) |>
-  pivot_longer(-Outcome, names_to = "grp", values_to = "chg") |>
-  mutate(grp = ifelse(grepl("Programme", grp), "Programme districts", "Other districts"),
-         Outcome = factor(Outcome, names(outcomes)))
+fa <- bind_rows(
+  A |> transmute(Outcome, grp = "Programme districts", chg = `Programme change`, se = `Programme change SE`),
+  A |> transmute(Outcome, grp = "Other districts", chg = `Other change`, se = `Other change SE`)) |>
+  mutate(Outcome = factor(Outcome, names(outcomes)), lo = chg - 1.96 * se, hi = chg + 1.96 * se)
 f29 <- ggplot(fa, aes(Outcome, chg, fill = grp)) +
   geom_col(position = position_dodge(.7), width = .62) + geom_hline(yintercept = 0, colour = "#374649") +
-  geom_text(aes(label = sprintf("%+.1f", chg), vjust = ifelse(chg >= 0, -0.5, 1.4)), position = position_dodge(.7), size = 3.4, colour = "#374649") +
+  geom_errorbar(aes(ymin = lo, ymax = hi), position = position_dodge(.7), width = .18, colour = "#374649", linewidth = .4) +
+  geom_text(aes(y = ifelse(chg >= 0, hi, lo), label = sprintf("%+.1f", chg), vjust = ifelse(chg >= 0, -0.6, 1.5)),
+            position = position_dodge(.7), size = 3.3, colour = "#374649") +
   scale_fill_manual(values = c("Programme districts" = "#E2007A", "Other districts" = "#00377C"), name = NULL) +
   scale_x_discrete(labels = function(x) stringr::str_wrap(x, 14)) +
   scale_y_continuous(expand = expansion(mult = c(.15, .15))) +
   labs(x = NULL, y = "Change 2024 to 2025 (percentage points)",
-       subtitle = "Girls, East Java: change between March 2024 and March 2025",
-       caption = "SUSENAS Maret 2024 and 2025, survey-weighted. Programme districts pooled; differences in change and p-values in the appendix.") +
+       caption = "Bars: change in each group. Lines: 95% confidence intervals. Programme districts pooled.") +
   theme_minimal(base_size = 12) + theme(legend.position = "top", panel.grid.major.x = element_blank(), panel.grid.minor = element_blank(),
                                         plot.caption = element_text(colour = "#7A8487", size = 8))
 save_fig(f29, "f29_programme_districts_en", width = 9.5, height = 5.2)
