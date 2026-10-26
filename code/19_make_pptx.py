@@ -17,6 +17,13 @@ if labels == 0:
     print("STOP: this PDF is an older version (no 'Data source' labels). Re-render the deck before building the PowerPoint.")
     raise SystemExit(1)
 
+def clean(raw):
+    """Plain text of a notes block: drop style/script blocks (MathJax injects CSS), tags and leftover CSS rules."""
+    t = re.sub(r'<(style|script)\b.*?</\1>', ' ', raw, flags=re.S | re.I)
+    t = html.unescape(re.sub(r'<[^>]+>', ' ', t))
+    t = re.sub(r'[\w.#:\-\[\]="\'>*]+\s*\{[^{}]*\}', ' ', t)
+    return re.sub(r'\s+', ' ', t).strip()
+
 H = open(HTML, encoding="utf-8").read()
 body = H[H.find('<div class="slides">'):]
 notes = []
@@ -24,7 +31,7 @@ for part in re.split(r'(?=<section\b)', body)[1:]:
     tag = part[:part.find('>') + 1]
     if 'id="title-slide"' in tag or re.search(r'class="[^"]*\bslide\b', tag):
         m = re.search(r'<aside class="notes">(.*?)</aside>', part, re.S)
-        notes.append(re.sub(r'\s+', ' ', html.unescape(re.sub(r'<[^>]+>', ' ', m.group(1)))).strip() if m else "")
+        notes.append(clean(m.group(1)) if m else "")
 if len(notes) != len(pdf):
     print(f"WARNING: {len(notes)} slides in the HTML but {len(pdf)} PDF pages; notes skipped to avoid misalignment.")
     notes = [""] * len(pdf)
