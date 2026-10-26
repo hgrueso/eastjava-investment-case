@@ -142,10 +142,13 @@ PROG_DID <- if (!is.null(.pa)) .pa$`Difference in change (pp)`[.pa$Outcome == "N
 PROG_P <- if (!is.null(.pa)) .pa$p[.pa$Outcome == "NEET"] else "n/a"
 PROG_CI <- if (!is.null(.pa) && "95% CI" %in% names(.pa)) .pa$`95% CI`[.pa$Outcome == "NEET"] else "n/a"
 BCR_TM <- if (!is.null(.sc)) .sc$BCR[grepl("Targeted at Madura", .sc$Scenario)][1] else NA
-BCR_TP <- if (!is.null(.sc)) .sc$BCR[grepl("poorest households \\(PKH\\)", .sc$Scenario)][1] else NA
+BCR_TP <- if (!is.null(.sc)) .sc$BCR[grepl("PKH households", .sc$Scenario)][1] else NA
 .st <- .rdc("projections/bcr_steps.csv")
 ONE_IN <- if (!is.null(.st)) .st$Value[grepl("^Girls exposed per girl", .st$Step)][1] else "14"
 ENR_G <- if (!is.null(.en)) sprintf("%.0f%%", as.numeric(.en$rate[.en$unit == "East Java" & .en$sex == "Girls" & .en$year == "2025"])) else "71%"
+.tg <- .rdc("models/targeting_scenarios.csv")
+.tgv <- function(g) if (is.null(.tg)) "n/a" else sprintf("%.0f%%", as.numeric(.tg$`Out of school, girls 16-18 (%)`[.tg$Group == g]))
+OOS_EJ <- .tgv("East Java"); OOS_M <- .tgv("Madura"); OOS_P <- .tgv("Poorest households (PKH)")
 TAB <- file.path("..", "output", "tables", "t8_target_funnel.csv")
 ```
 
@@ -563,13 +566,13 @@ if (!is.null(sc)) knitr::kable(sc |> dplyr::select(-`Cost per NEET case averted 
 :::
 
 ::: {style="font-size:0.58em; color:#7a7a7a;"}
-**Notes:** The central case is the retention channel. The targeted rows assume the programme's effect on school participation grows with the share of girls out of school in the group: in Madura and the poorest households more girls leave school, so the same spending moves more of them. The skills row adds the uncertain skills premium; the others show earnings at the 2025 minimum wage, and the cost of adding a Cash+ stipend for the poorest 40%. With other assumptions varied one at a time, the central return stays between USD `r RANGE_LO` and USD `r RANGE_HI` (appendix).
+**Notes:** The central case is the retention channel. The targeted rows assume the programme's effect on school participation grows with the share of girls out of school in the group. In Madura more girls are out of school (`r OOS_M`, against `r OOS_EJ` overall), so the same spending moves more of them. In PKH households fewer girls are out of school (`r OOS_P`), consistent with PKH's school-attendance condition, so a programme there adds less. The skills row adds the uncertain skills premium; the others show earnings at the 2025 minimum wage, and the cost of adding a Cash+ stipend for the poorest 40%. With other assumptions varied one at a time, the central return stays between USD `r RANGE_LO` and USD `r RANGE_HI` (appendix).
 :::
 
 
 
 ::: {.notes}
-The same calculation under different assumptions. The return is higher when the programme targets girls most likely to leave school, in Madura and the poorest households, because the same spending then changes the path of more girls. It is also higher with the skills effect or at the minimum wage, and lower if a new stipend is added to the cost.
+The same calculation under different assumptions. The return is higher in Madura, where more girls leave school, because the same spending then changes the path of more girls. It is lower in PKH households, where girls are already more likely to stay in school. It is also higher with the skills effect or at the minimum wage, and lower if a new stipend is added to the cost.
 :::
 
 ## How likely is the programme to pay for itself? {.smaller}
@@ -613,13 +616,13 @@ To test how much the result depends on our assumptions, we re-ran the calculatio
 
 **2.** Completing senior secondary is associated with 20 points lower NEET for girls; child marriage with leaving school and more unpaid family work. NEET is highest in Madura, for girls and boys.
 
-**3.** Most girls already stay in school (`r ENR_G` of girls aged 16–18 are in senior secondary), so a USD `r COST`-per-girl programme reaching all girls changes the path of about 1 in `r ONE_IN` and returns USD `r BCR_C` per dollar. Targeting the girls most at risk raises this to USD `r BCR_TM` in Madura and USD `r BCR_TP` in the poorest households. The next frontier is the transition into work: if skills training also raises earnings, the return could reach USD `r BCR_SK`, an effect still to be tested in a pilot.
+**3.** Most girls already stay in school (`r ENR_G` of girls aged 16–18 are in senior secondary), so a USD `r COST`-per-girl programme reaching all girls changes the path of about 1 in `r ONE_IN` and returns USD `r BCR_C` per dollar. Targeting Madura, where far more girls are out of school, raises this to USD `r BCR_TM`. The next frontier is the transition into work: if skills training also raises earnings, the return could reach USD `r BCR_SK`, an effect still to be tested in a pilot.
 :::
 :::
 
 
 ::: {.notes}
-Three messages. The gap is at the transition out of school, and it is costly. Completing senior secondary matters, but most girls already stay in school, so a programme reaching everyone changes the path of only a minority. That is why the return is higher when the programme targets the girls most at risk, and why the next step is the transition into work, where skills training could add most, an effect that a pilot should measure.
+Three messages. The gap is at the transition out of school, and it is costly. Completing senior secondary matters, but most girls already stay in school, so a programme reaching everyone changes the path of only a minority. That is why the return is higher when the programme targets places like Madura, where more girls leave school, and why the next step is the transition into work, where skills training could add most, an effect that a pilot should measure.
 :::
 
 ## Policy recommendations {.smaller .bigtitle}
@@ -628,9 +631,9 @@ Three messages. The gap is at the transition out of school, and it is costly. Co
 ::: {.kf-list style="font-size:.84em;"}
 **1. Target the transition, not enrolment.** Girls attend school at the same rate as boys, and senior-secondary enrolment rose faster in East Java than elsewhere in 2024–2025, but tertiary enrolment rose more slowly. Set targets on completion and the first job or further study, and pilot the skills component with an evaluation so its effect on earnings can be measured.
 
-**2. Start in Madura and the poorest households.** NEET is highest and attendance lowest in Madura, and child marriage falls with household wealth (2024 data). Targeting these girls raises the projected return from USD `r BCR_C` to USD `r BCR_TM`–`r BCR_TP` per dollar.
+**2. Start in Madura.** NEET is highest and attendance lowest there: `r OOS_M` of girls aged 16–18 are out of school, against `r OOS_EJ` across East Java. Targeting Madura raises the projected return from USD `r BCR_C` to USD `r BCR_TM` per dollar.
 
-**3. Link girls to PKH and PIP rather than creating a new transfer.** Indonesian evidence shows PKH reduces girls' child marriage; linkage uses existing systems.
+**3. Link girls to PKH and PIP rather than creating a new transfer.** Indonesian evidence shows PKH reduces girls' child marriage, and girls in PKH households are already less likely to be out of school (`r OOS_P`, against `r OOS_EJ` overall). Linkage uses existing systems.
 
 **4. Fund pedagogy and mentoring, not devices.** Internet use is already near universal, and devices alone did not raise learning in Uruguay.
 

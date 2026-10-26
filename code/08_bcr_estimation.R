@@ -123,7 +123,7 @@ if (file.exists(tg_path)) {
   tg <- read_csv(tg_path, show_col_types = FALSE)
   add <- list(
     "Targeted at Madura, retention channel" = list(`NEET reduction per exposed girl` = tg$`NEET reduction (pp)`[tg$Group == "Madura"] / 100),
-    "Targeted at the poorest households (PKH), retention channel" = list(`NEET reduction per exposed girl` = tg$`NEET reduction (pp)`[tg$Group == "Poorest households (PKH)"] / 100))
+    "Targeted at PKH households, retention channel" = list(`NEET reduction per exposed girl` = tg$`NEET reduction (pp)`[tg$Group == "Poorest households (PKH)"] / 100))
   scen <- append(scen, add, after = 1)
 }
 res <- bind_rows(lapply(names(scen), function(n) { x <- calc(scen[[n]])
@@ -197,7 +197,7 @@ cat("\n================ COSTING (single package) ================\n"); print(cos
 cat("\n================ BCR ================\n"); print(as.data.frame(res))
 cat(sprintf("\nHeadline: every USD 1 invested returns about USD %.2f (central, retention channel); USD %.2f if the 5.6%% skills premium held.\n", base$bcr, calc(with_skills)$bcr))
 cat("\n================ HOW THE NUMBER IS BUILT ================\n"); print(as.data.frame(steps))
-cat(sprintf("Break-even (retention channel only): pays for itself at a %.1fpp NEET reduction (central assumption: 5pp).\n", breakeven_pp))
+cat(sprintf("Break-even (retention channel only): pays for itself at a %.1fpp NEET reduction (central assumption: %.1fpp).\n", breakeven_pp, 100*NEET_C))
 cat("\n================ SENSITIVITY (one parameter at a time) ================\n"); print(as.data.frame(tornado |> select(-spread)))
 
 message("Stage 8 complete -> output/projections/bcr_*.csv (figures: run 08b_roi_figures.R)")
