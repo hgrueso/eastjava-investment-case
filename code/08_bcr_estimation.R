@@ -117,6 +117,15 @@ scen <- list("Central: retention channel (Indonesian causal evidence)" = list(),
              "Plus skills earnings premium of 5.6% (point estimate, not statistically significant)" = list(`Skills earnings premium (all exposed girls who work)` = 0.056),
              "Retention channel, earnings at the 2025 minimum wage" = list(`Female annual wage (East Java)` = 2.31e6 * 12),
              "Retention channel, with Cash+ stipend for the poorest 40%" = list(`Cash+ stipend cost (optional)` = 46))
+# Targeted scenarios (20_targeting_scenario.R): effect scaled by the share of girls out of school
+tg_path <- here::here("output","models","targeting_scenarios.csv")
+if (file.exists(tg_path)) {
+  tg <- read_csv(tg_path, show_col_types = FALSE)
+  add <- list(
+    "Targeted at Madura, retention channel" = list(`NEET reduction per exposed girl` = tg$`NEET reduction (pp)`[tg$Group == "Madura"] / 100),
+    "Targeted at the poorest households (PKH), retention channel" = list(`NEET reduction per exposed girl` = tg$`NEET reduction (pp)`[tg$Group == "Poorest households (PKH)"] / 100))
+  scen <- append(scen, add, after = 1)
+}
 res <- bind_rows(lapply(names(scen), function(n) { x <- calc(scen[[n]])
   tibble(Scenario = n,
          `Retention benefit (USD/girl)` = fmt(x$benefit_ret),
